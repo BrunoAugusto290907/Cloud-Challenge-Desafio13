@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área do Gestor</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main>
+    <h1>🔒 Área do Gestor</h1>
+    <p>Moderação de comentários do atendimento.</p>
+
+    <div class="campo-gestor">
+      <label for="token">Token do gestor:</label>
+      <input
+        type="password"
+        id="token"
+        placeholder="Digite o token de acesso"
+        autocomplete="off"
+      >
+    </div>
+
+    <div class="campo-gestor">
+      <label for="servico">Selecione o serviço:</label>
+      <select id="servico">
+        <option value="">Selecione...</option>
+      </select>
+    </div>
+
+    <button id="buscar" type="button">
+      Buscar avaliações
+    </button>
+
+    <p id="mensagem" role="status"></p>
+    <div id="avaliacoes"></div>
+
+    <a href="/">Voltar ao início</a>
+  </main>
+
+  <script src="/js/gestor.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Avaliações</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    main { max-width: 850px; }
+    .servico-card {
+      border: 1px solid #e2e8f0;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    .media { font-size: 24px; font-weight: bold; color: #2563eb; }
+    .barra {
+      background: #e2e8f0;
+      height: 12px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex: 1;
+    }
+    .preenchimento { background: #2563eb; height: 100%; }
+    .linha-nota {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 8px 0;
+    }
+    .linha-nota span { min-width: 30px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>📊 Painel de Avaliações</h1>
+    <p>Confira a satisfação com nossos serviços.</p>
+
+    <div id="painel">Carregando avaliações...</div>
+
+    <a href="/">← Voltar para avaliação</a>
+  </main>
+
+  <script src="/js/painel.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avalie o Atendimento</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main>
+    <h1>⭐ Avalie o Atendimento</h1>
+    <p>Sua opinião ajuda a melhorar nossos serviços!</p>
+
+    <form id="form-avaliacao">
+      <label for="servico">Escolha o serviço:</label>
+      <select id="servico" required>
+        <option value="">Selecione...</option>
+      </select>
+
+      <label for="nota">Nota:</label>
+      <select id="nota" required>
+        <option value="">Selecione...</option>
+        <option value="1">⭐ 1</option>
+        <option value="2">⭐⭐ 2</option>
+        <option value="3">⭐⭐⭐ 3</option>
+        <option value="4">⭐⭐⭐⭐ 4</option>
+        <option value="5">⭐⭐⭐⭐⭐ 5</option>
+      </select>
+
+      <label for="comentario">Comentário (opcional):</label>
+      <textarea id="comentario" maxlength="280"></textarea>
+
+      <button type="submit">Enviar avaliação</button>
+    </form>
+
+    <p id="mensagem" role="status"></p>
+    <a href="/painel.html">Ver painel de avaliações</a>
+  </main>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
