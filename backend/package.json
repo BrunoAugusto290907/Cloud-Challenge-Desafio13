@@ -1,0 +1,19 @@
+{
+  "name": "avalie-o-atendimento",
+  "version": "1.0.0",
+  "description": "Cloud Challenge - Desafio 13: Avalie o Atendimento (API)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "pg": "^8.23.1"
+  }
+}

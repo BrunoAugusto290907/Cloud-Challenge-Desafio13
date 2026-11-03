@@ -1,0 +1,59 @@
+### Extensao "REST Client" do VS Code
+@host = http://localhost:3000
+@token = troque-este-valor
+
+### Saude (testa o banco)
+GET {{host}}/health
+
+### Servicos
+GET {{host}}/api/servicos
+
+### Registrar avaliacao valida
+POST {{host}}/api/avaliacoes
+Content-Type: application/json
+
+{ "servico_id": 1, "nota": 5, "comentario": "Atendimento rapido!" }
+
+### CA1 - nota 0 -> 400
+POST {{host}}/api/avaliacoes
+Content-Type: application/json
+
+{ "servico_id": 1, "nota": 0 }
+
+### CA1 - nota 6 -> 400
+POST {{host}}/api/avaliacoes
+Content-Type: application/json
+
+{ "servico_id": 1, "nota": 6 }
+
+### CA1 - nota 3.5 -> 400
+POST {{host}}/api/avaliacoes
+Content-Type: application/json
+
+{ "servico_id": 1, "nota": 3.5 }
+
+### Servico inexistente -> 404
+POST {{host}}/api/avaliacoes
+Content-Type: application/json
+
+{ "servico_id": 9999, "nota": 4 }
+
+### Painel de todos os servicos (CA3 e CA4)
+GET {{host}}/api/painel
+
+### Painel de um servico
+GET {{host}}/api/painel/1
+
+### Comentarios publicos de um servico
+GET {{host}}/api/servicos/1/avaliacoes
+
+### Gestor: lista tudo (inclui ocultas)
+GET {{host}}/api/avaliacoes?servico_id=1
+x-gestor-token: {{token}}
+
+### Gestor: ocultar comentario (CA5)
+PATCH {{host}}/api/avaliacoes/1/ocultar
+x-gestor-token: {{token}}
+
+### Sem token -> 401
+PATCH {{host}}/api/avaliacoes/1/ocultar
