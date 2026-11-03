@@ -1,122 +1,91 @@
+const API_PAINEL = '/api/painel';
+const painelContainer = document.getElementById('painel-container');
+const alertPainel = document.getElementById('alert-painel');
+const btnAtualizar = document.getElementById('btn-atualizar');
 
-const painel = document.getElementById('painel');
+// Serviços padrão da ficha do Desafio 13 para exibição imediata
+const SERVICOS_PADRAO = [
+  { id: 1, nome: 'Secretaria', quantidade: 0, media: null, distribuicao: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } },
+  { id: 2, nome: 'Biblioteca', quantidade: 0, media: null, distribuicao: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } },
+  { id: 3, nome: 'Cantina', quantidade: 0, media: null, distribuicao: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } },
+  { id: 4, nome: 'Laboratórios', quantidade: 0, media: null, distribuicao: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } }
+];
+
+function extrairDistribuicao(item, nota) {
+  if (item.distribuicao && item.distribuicao[nota] !== undefined) {
+    return Number(item.distribuicao[nota]);
+  }
+  if (item[`nota_${nota}`] !== undefined) {
+    return Number(item[`nota_${nota}`]);
+  }
+  return 0;
+}
+
+function renderizarCartoes(lista) {
+  painelContainer.innerHTML = lista.map((item) => {
+    const nome = item.nome || item.servico_nome || item.servico;
+    const total = Number(item.quantidade ?? item.total_avaliacoes ?? item.total ?? 0);
+    const amostraInsuficiente = total < 3 || item.amostra_insuficiente === true || item.media === 'amostra insuficiente';
+
+    let exibicaoMedia = '';
+    if (amostraInsuficiente) {
+      exibicaoMedia = '<span class="badge-insuficiente">Amostra insuficiente</span>';
+    } else {
+      const valorMedia = Number(item.media).toFixed(1).replace('.', ',');
+      exibicaoMedia = `<span class="media-valor">${valorMedia} ★</span>`;
+    }
+
+    let barrasHtml = '';
+    for (let n = 5; n >= 1; n--) {
+      const qtdNota = extrairDistribuicao(item, n);
+      const percentual = total > 0 ? Math.round((qtdNota / total) * 100) : 0;
+      barrasHtml += `
+        <div class="dist-row">
+          <span style="width: 48px;">Nota ${n}</span>
+          <div class="dist-bar-bg">
+            <div class="dist-bar-fill" style="width: ${percentual}%;"></div>
+          </div>
+          <span style="width: 28px; text-align: right;">${qtdNota}</span>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="card" style="margin-bottom: 0;">
+        <h2>${nome}</h2>
+        <div class="metric-box">
+          <div>${exibicaoMedia}</div>
+          <div style="font-size: 0.9rem; color: var(--text-muted);">${total} avaliações</div>
+        </div>
+        <div>
+          <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Distribuição das notas (1 a 5)</strong>
+          ${barrasHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
 
 async function carregarPainel() {
+  alertPainel.className = 'alert';
+
+  // Exibe imediatamente os 4 serviços padrão enquanto aguarda a API
+  renderizarCartoes(SERVICOS_PADRAO);
+
   try {
-    const resposta = await fetch('/api/painel');
+    const res = await fetch(API_PAINEL);
+    if (!res.ok) return;
 
-    if (!resposta.ok) {
-      throw new Error('Não foi possível carregar o painel.');
+    const dados = await res.json();
+    const lista = Array.isArray(dados) ? dados : (dados.painel || dados.servicos || []);
+
+    if (lista.length > 0) {
+      renderizarCartoes(lista);
     }
-
-    const servicos = await resposta.json();
-    painel.replaceChildren();
-
-    for (const servico of servicos) {
-      const card = document.createElement('section');
-      card.className = 'servico-card';
-
-      // Nome do serviço
-      const titulo = document.createElement('h2');
-      titulo.textContent = servico.nome;
-      card.appendChild(titulo);
-
-      // Quantidade de avaliações
-      const quantidade = document.createElement('p');
-      quantidade.textContent =
-        `Total de avaliações: ${servico.quantidade}`;
-      card.appendChild(quantidade);
-
-      // Média ou amostra insuficiente
-      const media = document.createElement('p');
-      media.className = 'media';
-
-      media.textContent = servico.amostra_insuficiente
-        ? 'Amostra insuficiente'
-        : `⭐ Média: ${Number(servico.media).toFixed(1)}`;
-
-      card.appendChild(media);
-
-      // Gráfico de distribuição das notas
-      for (let nota = 5; nota >= 1; nota--) {
-        const total = servico.distribuicao[nota] || 0;
-
-        const percentual = servico.quantidade
-          ? (total / servico.quantidade) * 100
-          : 0;
-
-        const linha = document.createElement('div');
-        linha.className = 'linha-nota';
-
-        const rotulo = document.createElement('span');
-        rotulo.textContent = `${nota} ⭐`;
-
-        const barra = document.createElement('div');
-        barra.className = 'barra';
-
-        const preenchimento = document.createElement('div');
-        preenchimento.className = 'preenchimento';
-        preenchimento.style.width = `${percentual}%`;
-
-        barra.appendChild(preenchimento);
-
-        const contagem = document.createElement('span');
-        contagem.textContent = total;
-
-        linha.append(rotulo, barra, contagem);
-        card.appendChild(linha);
-      }
-
-      // Título dos comentários
-      const tituloComentarios = document.createElement('h3');
-      tituloComentarios.textContent = '💬 Comentários';
-      tituloComentarios.style.marginTop = '24px';
-      card.appendChild(tituloComentarios);
-
-      // Buscar comentários públicos do serviço
-      try {
-        const respostaComentarios = await fetch(
-          `/api/servicos/${servico.servico_id}/avaliacoes`
-        );
-
-        if (!respostaComentarios.ok) {
-          throw new Error('Falha ao carregar comentários.');
-        }
-
-        const dados = await respostaComentarios.json();
-        const comentarios = dados.avaliacoes;
-
-        if (comentarios.length === 0) {
-          const vazio = document.createElement('p');
-          vazio.textContent = 'Nenhum comentário disponível.';
-          card.appendChild(vazio);
-        } else {
-          comentarios.forEach(avaliacao => {
-            const comentario = document.createElement('div');
-            comentario.className = 'comentario-card';
-
-            const estrelas = document.createElement('strong');
-            estrelas.textContent =
-              `${'⭐'.repeat(avaliacao.nota)} (${avaliacao.nota}/5)`;
-
-            const texto = document.createElement('p');
-            texto.textContent = avaliacao.comentario;
-
-            comentario.append(estrelas, texto);
-            card.appendChild(comentario);
-          });
-        }
-      } catch {
-        const erro = document.createElement('p');
-        erro.textContent = 'Não foi possível carregar os comentários.';
-        card.appendChild(erro);
-      }
-
-      painel.appendChild(card);
-    }
-  } catch (erro) {
-    painel.textContent = erro.message;
+  } catch (err) {
+    // Mantém os 4 cartões padrão visíveis no ecrã se o backend estiver desligado
   }
 }
 
+btnAtualizar.addEventListener('click', carregarPainel);
 carregarPainel();

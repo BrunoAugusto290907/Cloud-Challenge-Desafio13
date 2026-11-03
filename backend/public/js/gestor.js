@@ -1,112 +1,101 @@
+const API_SERVICOS = '/api/servicos';
+const API_AVALIACOES = '/api/avaliacoes';
 
-const tokenInput = document.getElementById('token');
-const servicoSelect = document.getElementById('servico');
-const buscarBtn = document.getElementById('buscar');
-const mensagem = document.getElementById('mensagem');
-const lista = document.getElementById('avaliacoes');
+const filtroGestor = document.getElementById('filtro-gestor');
+const listaModeracao = document.getElementById('lista-moderacao');
+const alertGestor = document.getElementById('alert-gestor');
+
+let mapaServicos = {
+  1: 'Secretaria',
+  2: 'Biblioteca',
+  3: 'Cantina',
+  4: 'Laboratórios'
+};
+
+function mostrarAlerta(msg, tipo) {
+  alertGestor.textContent = msg;
+  alertGestor.className = `alert ${tipo}`;
+}
 
 async function carregarServicos() {
   try {
-    const resposta = await fetch('/api/servicos');
-    if (!resposta.ok) throw new Error();
+    const res = await fetch(API_SERVICOS);
+    if (!res.ok) return;
+    const dados = await res.json();
+    const servicos = Array.isArray(dados) ? dados : (dados.servicos || []);
 
-    const servicos = await resposta.json();
-
-    for (const servico of servicos) {
-      const opcao = document.createElement('option');
-      opcao.value = servico.id;
-      opcao.textContent = servico.nome;
-      servicoSelect.appendChild(opcao);
+    if (servicos.length > 0) {
+      filtroGestor.innerHTML = '<option value="">Todos os serviços</option>';
+      servicos.forEach((s) => {
+        mapaServicos[s.id] = s.nome;
+        filtroGestor.innerHTML += `<option value="${s.id}">${s.nome}</option>`;
+      });
     }
-  } catch {
-    mensagem.textContent = 'Erro ao carregar serviços.';
+  } catch (err) {
+    // Mantém os 4 serviços padrão caso a API não responda
   }
 }
 
-async function buscarAvaliacoes() {
-  const token = tokenInput.value;
-  const servicoId = servicoSelect.value;
-
-  lista.replaceChildren();
-
-  if (!token || !servicoId) {
-    mensagem.textContent = 'Informe o token e o serviço.';
-    return;
-  }
-
+async function carregarAvaliacoesGestor() {
   try {
-    const resposta = await fetch(
-      `/api/avaliacoes?servico_id=${servicoId}`,
-      { headers: { 'x-gestor-token': token } }
-    );
+    const servicoId = filtroGestor.value;
+    const url = servicoId ? `${API_AVALIACOES}?servico_id=${servicoId}&incluir_ocultas=true` : `${API_AVALIACOES}?incluir_ocultas=true`;
+    const res = await fetch(url);
+    const dados = await res.json();
+    const avaliacoes = Array.isArray(dados) ? dados : (dados.avaliacoes || []);
 
-    if (resposta.status === 401) {
-      throw new Error('Token inválido.');
+    if (avaliacoes.length === 0) {
+      listaModeracao.innerHTML = '<p style="color: var(--text-muted);">Nenhuma avaliação encontrada.</p>';
+      return;
     }
-    if (!resposta.ok) {
-      throw new Error('Não foi possível buscar avaliações.');
-    }
 
-    const avaliacoes = await resposta.json();
-    mensagem.textContent = `${avaliacoes.length} avaliações encontradas.`;
+    listaModeracao.innerHTML = avaliacoes.map((a) => {
+      const nomeServico = a.servico_nome || mapaServicos[a.servico_id] || `Serviço #${a.servico_id}`;
+      const textoComentario = a.comentario || '<em>Sem comentário escrito</em>';
+      const statusHtml = a.oculta ? '<span class="badge-oculto">Comentário Oculto</span>' : '';
+      const botaoHtml = !a.oculta
+        ? `<button class="btn-danger" onclick="ocultarComentario(${a.id})">Ocultar comentário</button>`
+        : '';
 
-    for (const avaliacao of avaliacoes) {
-      const card = document.createElement('div');
-      card.className = 'comentario-card';
-
-      const nota = document.createElement('strong');
-      nota.textContent = `Nota: ${avaliacao.nota}/5`;
-
-      const comentario = document.createElement('p');
-      comentario.textContent =
-        avaliacao.comentario || 'Sem comentário';
-
-      const status = document.createElement('p');
-      status.textContent = avaliacao.oculta
-        ? 'Comentário oculto'
-        : 'Comentário visível';
-
-      card.append(nota, comentario, status);
-
-      if (avaliacao.comentario && !avaliacao.oculta) {
-        const botao = document.createElement('button');
-        botao.textContent = 'Ocultar comentário';
-        botao.type = 'button';
-
-        botao.addEventListener('click', async () => {
-          if (!confirm('Deseja ocultar este comentário?')) return;
-
-          botao.disabled = true;
-
-          try {
-            const resposta = await fetch(
-              `/api/avaliacoes/${avaliacao.id}/ocultar`,
-              {
-                method: 'PATCH',
-                headers: { 'x-gestor-token': tokenInput.value }
-              }
-            );
-
-            if (!resposta.ok) {
-              throw new Error('Não foi possível ocultar.');
-            }
-
-            await buscarAvaliacoes();
-          } catch (erro) {
-            mensagem.textContent = erro.message;
-            botao.disabled = false;
-          }
-        });
-
-        card.appendChild(botao);
-      }
-
-      lista.appendChild(card);
-    }
-  } catch (erro) {
-    mensagem.textContent = erro.message;
+      return `
+        <div class="comment-item">
+          <div>
+            <div class="comment-meta">
+              <strong>#${a.id} - ${nomeServico}</strong> • <span class="badge-nota">Nota ${a.nota}</span> ${statusHtml}
+            </div>
+            <div>${textoComentario}</div>
+          </div>
+          <div>${botaoHtml}</div>
+        </div>
+      `;
+    }).join('');
+  } catch (err) {
+    listaModeracao.innerHTML = '<p style="color: var(--text-muted);">Conecte a API para carregar as avaliações para moderação.</p>';
   }
 }
 
-buscarBtn.addEventListener('click', buscarAvaliacoes);
-carregarServicos();
+async function ocultarComentario(id) {
+  try {
+    const res = await fetch(`${API_AVALIACOES}/${id}/ocultar`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ oculta: true })
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      const msgErro = data.erro || data.error || data.message || 'Não foi possível ocultar o comentário.';
+      mostrarAlerta(`HTTP ${res.status}: ${msgErro}`, 'error');
+      return;
+    }
+
+    mostrarAlerta(`Comentário #${id} ocultado com sucesso (a nota permanece na média).`, 'success');
+    carregarAvaliacoesGestor();
+  } catch (err) {
+    mostrarAlerta('Erro de comunicação com a API.', 'error');
+  }
+}
+
+filtroGestor.addEventListener('change', carregarAvaliacoesGestor);
+carregarServicos().then(carregarAvaliacoesGestor);
