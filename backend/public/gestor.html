@@ -1,44 +1,41 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Área do Gestor</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>Moderação do Gestor - Avalie o Atendimento</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <header>
+    <h1>Avalie o Atendimento</h1>
+    <nav>
+      <a href="index.html">Avaliar Serviço</a>
+      <a href="painel.html">Painel de Satisfação</a>
+      <a href="gestor.html" class="active">Moderação (Gestor)</a>
+    </nav>
+  </header>
+
   <main>
-    <h1>🔒 Área do Gestor</h1>
-    <p>Moderação de comentários do atendimento.</p>
+    <section class="card">
+      <h2>Moderação de Comentários</h2>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Ocultar um comentário impróprio remove o texto da lista pública, mas mantém a nota no cálculo da média do serviço.
+      </p>
 
-    <div class="campo-gestor">
-      <label for="token">Token do gestor:</label>
-      <input
-        type="password"
-        id="token"
-        placeholder="Digite o token de acesso"
-        autocomplete="off"
-      >
-    </div>
+      <div id="alert-gestor" class="alert"></div>
 
-    <div class="campo-gestor">
-      <label for="servico">Selecione o serviço:</label>
-      <select id="servico">
-        <option value="">Selecione...</option>
-      </select>
-    </div>
+      <div class="form-group">
+        <label for="filtro-gestor">Filtrar por serviço</label>
+        <select id="filtro-gestor">
+          <option value="">Todos os serviços</option>
+        </select>
+      </div>
 
-    <button id="buscar" type="button">
-      Buscar avaliações
-    </button>
-
-    <p id="mensagem" role="status"></p>
-    <div id="avaliacoes"></div>
-
-    <a href="/">Voltar ao início</a>
+      <div id="lista-moderacao">Carregando avaliações...</div>
+    </section>
   </main>
 
-  <script src="/js/gestor.js"></script>
+  <script src="js/gestor.js"></script>
 </body>
 </html>

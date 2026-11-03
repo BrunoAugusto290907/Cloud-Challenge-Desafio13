@@ -1,43 +1,61 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Avalie o Atendimento</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>Avalie o Atendimento - Estudante</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <header>
+    <h1>Avalie o Atendimento</h1>
+    <nav>
+      <a href="index.html" class="active">Avaliar Serviço</a>
+      <a href="painel.html">Painel de Satisfação</a>
+      <a href="gestor.html">Moderação (Gestor)</a>
+    </nav>
+  </header>
+
   <main>
-    <h1>⭐ Avalie o Atendimento</h1>
-    <p>Sua opinião ajuda a melhorar nossos serviços!</p>
+    <section class="card">
+      <h2>Registrar Avaliação Anônima</h2>
+      <div id="alert-box" class="alert"></div>
 
-    <form id="form-avaliacao">
-      <label for="servico">Escolha o serviço:</label>
-      <select id="servico" required>
-        <option value="">Selecione...</option>
-      </select>
+      <form id="form-avaliacao" novalidate>
+        <div class="form-group">
+          <label for="servico_id">Serviço da Unidade</label>
+          <select id="servico_id" required>
+            <option value="">Carregando serviços...</option>
+          </select>
+        </div>
 
-      <label for="nota">Nota:</label>
-      <select id="nota" required>
-        <option value="">Selecione...</option>
-        <option value="1">⭐ 1</option>
-        <option value="2">⭐⭐ 2</option>
-        <option value="3">⭐⭐⭐ 3</option>
-        <option value="4">⭐⭐⭐⭐ 4</option>
-        <option value="5">⭐⭐⭐⭐⭐ 5</option>
-      </select>
+        <div class="form-group">
+          <label for="nota">Nota (1 a 5)</label>
+          <input type="number" id="nota" step="any" placeholder="Digite uma nota inteira de 1 a 5" required>
+        </div>
 
-      <label for="comentario">Comentário (opcional):</label>
-      <textarea id="comentario" maxlength="280"></textarea>
+        <div class="form-group">
+          <label for="comentario">Comentário (opcional, até 280 caracteres)</label>
+          <textarea id="comentario" placeholder="Deixe sua sugestão ou relato de forma anônima..."></textarea>
+          <div id="char-count" class="char-counter">0 / 280 caracteres</div>
+        </div>
 
-      <button type="submit">Enviar avaliação</button>
-    </form>
+        <button type="submit">Enviar Avaliação Anônima</button>
+      </form>
+    </section>
 
-    <p id="mensagem" role="status"></p>
-    <a href="/painel.html">Ver painel de avaliações</a>
+    <section class="card">
+      <h2>Avaliações Públicas Recentes</h2>
+      <div class="form-group">
+        <label for="filtro-servico">Filtrar por serviço</label>
+        <select id="filtro-servico">
+          <option value="">Todos os serviços</option>
+        </select>
+      </div>
+      <div id="lista-publica">Carregando avaliações...</div>
+    </section>
   </main>
 
-  <script src="/js/app.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
