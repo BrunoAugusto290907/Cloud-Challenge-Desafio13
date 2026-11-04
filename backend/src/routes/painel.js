@@ -46,3 +46,29 @@ router.get('/:servicoId', async (req, res) => {
 });
 
 module.exports = router;
+
+SELECT 
+    s.id, 
+    s.nome, 
+    COUNT(a.id) AS total_avaliacoes,
+    AVG(a.nota) AS media_notas
+FROM 
+    servicos s
+LEFT JOIN 
+    avaliacoes a ON s.id = a.servico_id
+GROUP BY 
+    s.id, s.nome
+ORDER BY 
+    s.id ASC;
+
+SELECT 
+    nota, 
+    COUNT(*) AS quantidade
+FROM 
+    avaliacoes
+WHERE 
+    servico_id = $1
+GROUP BY 
+    nota
+ORDER BY 
+    nota DESC;

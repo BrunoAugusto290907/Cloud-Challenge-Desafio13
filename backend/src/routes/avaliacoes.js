@@ -61,3 +61,21 @@ router.patch('/:id/ocultar', exigirGestor, async (req, res) => {
 });
 
 module.exports = router;
+
+SELECT 
+    nota, 
+    comentario, 
+    criada_em
+FROM 
+    avaliacoes
+WHERE 
+    servico_id = $1 
+    AND oculta = false 
+    AND comentario IS NOT NULL 
+    AND TRIM(comentario) <> ''
+ORDER BY 
+    criada_em DESC;
+
+INSERT INTO avaliacoes (servico_id, nota, comentario) 
+VALUES ($1, $2, $3) 
+RETURNING *;
