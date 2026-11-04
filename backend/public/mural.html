@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avalie o Atendimento - Mural Público</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Avalie o Atendimento</h1>
+    <nav>
+      <a href="index.html">Avaliar Serviço</a>
+      <a href="mural.html" class="active">Mural Público</a>
+      <a href="painel.html">Painel de Satisfação</a>
+      <a href="gestor.html">Moderação (Gestor)</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <h2 style="margin-bottom: 0.25rem;">Mural de Avaliações Públicas</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Veja os relatos e notas enviados pelos estudantes da unidade.</p>
+        </div>
+        <div style="min-width: 220px;">
+          <select id="filtro-servico" aria-label="Filtrar por serviço">
+            <option value="">Todos os serviços (4)</option>
+            <option value="1">Secretaria</option>
+            <option value="2">Biblioteca</option>
+            <option value="3">Cantina</option>
+            <option value="4">Laboratórios</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="lista-publica">Carregando avaliações públicas...</div>
+    </section>
+  </main>
+
+  <script src="js/mural.js"></script>
+</body>
+</html>

@@ -1,4 +1,6 @@
 const STORAGE_KEY = 'desafio13_avaliacoes_dados';
+const PRIVADAS_KEY = 'desafio13_ids_privados';
+
 const painelContainer = document.getElementById('painel-container');
 const alertPainel = document.getElementById('alert-painel');
 const btnAtualizar = document.getElementById('btn-atualizar');
@@ -10,37 +12,72 @@ const SERVICOS_FIXOS = [
   { id: 4, nome: 'Laboratórios' }
 ];
 
-async function requisitarApi(caminho) {
-  for (const prefixo of ['/api', '']) {
-    try {
-      const res = await fetch(`${prefixo}${caminho}`);
-      if (res.status !== 404) return res;
-    } catch (e) {
-      // Continua para o fallback
-    }
+const DADOS_INICIAIS = [
+  { id: 1, servico_id: 1, servico_nome: 'Secretaria', nota: 5, comentario: 'Atendimento rápido na emissão do histórico escolar.', oculta: false, privada: false },
+  { id: 2, servico_id: 1, servico_nome: 'Secretaria', nota: 4, comentario: 'Resolveram minha matrícula, apenas uma pequena fila.', oculta: false, privada: false },
+  { id: 3, servico_id: 1, servico_nome: 'Secretaria', nota: 4, comentario: 'Bons esclarecimentos sobre os prazos acadêmicos.', oculta: false, privada: false },
+  { id: 4, servico_id: 2, servico_nome: 'Biblioteca', nota: 5, comentario: 'Ambiente silencioso e acervo muito bem organizado.', oculta: false, privada: false },
+  { id: 5, servico_id: 2, servico_nome: 'Biblioteca', nota: 5, comentario: 'Renovação de livros super prática no balcão.', oculta: false, privada: false },
+  { id: 6, servico_id: 2, servico_nome: 'Biblioteca', nota: 4, comentario: 'Ótimo espaço de estudo em grupo.', oculta: false, privada: false },
+  { id: 7, servico_id: 3, servico_nome: 'Cantina', nota: 4, comentario: 'Lanches bons e atendimento cordial.', oculta: false, privada: false },
+  { id: 8, servico_id: 3, servico_nome: 'Cantina', nota: 3, comentario: 'Fila grande no horário do intervalo das 20h.', oculta: false, privada: false },
+  { id: 9, servico_id: 3, servico_nome: 'Cantina', nota: 4, comentario: 'Boas opções de salgados e sucos.', oculta: false, privada: false },
+  { id: 10, servico_id: 4, servico_nome: 'Laboratórios', nota: 5, comentario: 'Computadores rápidos e com VS Code configurado.', oculta: false, privada: false },
+  { id: 11, servico_id: 4, servico_nome: 'Laboratórios', nota: 4, comentario: 'Rede estável durante toda a aula prática.', oculta: false, privada: false }
+];
+
+function obterIdsPrivados() {
+  try {
+    return JSON.parse(localStorage.getItem(PRIVADAS_KEY) || '[]');
+  } catch (e) {
+    return [];
   }
-  throw new Error('API offline');
 }
 
-function calcularPainelLocal() {
-  const salvo = localStorage.getItem(STORAGE_KEY);
-  const avaliacoes = salvo ? JSON.parse(salvo) : [
-    { id: 1, servico_id: 1, nota: 5, oculta: false },
-    { id: 2, servico_id: 1, nota: 4, oculta: false },
-    { id: 3, servico_id: 1, nota: 4, oculta: false },
-    { id: 4, servico_id: 2, nota: 5, oculta: false },
-    { id: 5, servico_id: 2, nota: 5, oculta: false },
-    { id: 6, servico_id: 2, nota: 4, oculta: false },
-    { id: 7, servico_id: 3, nota: 4, oculta: false },
-    { id: 8, servico_id: 3, nota: 3, oculta: false },
-    { id: 9, servico_id: 3, nota: 4, oculta: false },
-    { id: 10, servico_id: 4, nota: 5, oculta: false },
-    { id: 11, servico_id: 4, nota: 4, oculta: false }
-  ];
+function obterAvaliacoesLocais() {
+  try {
+    const salvo = localStorage.getItem(STORAGE_KEY);
+    if (!salvo) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DADOS_INICIAIS));
+      return [...DADOS_INICIAIS];
+    }
+    return JSON.parse(salvo);
+  } catch (e) {
+    return [...DADOS_INICIAIS];
+  }
+}
 
-  // Regra RF5/CA5: comentários ocultos continuam contando normalmente na média!
+async function buscarAvaliacoesAtuais() {
+  const salvo = localStorage.getItem(STORAGE_KEY);
+  if (salvo) {
+    return JSON.parse(salvo);
+  }
+
+  for (const prefixo of ['/api', '']) {
+    try {
+      const res = await fetch(`${prefixo}/avaliacoes`);
+      if (res.ok) {
+        const dados = await res.json();
+        return Array.isArray(dados) ? dados : (dados.avaliacoes || []);
+      }
+    } catch (e) {
+      // Continua para os dados locais
+    }
+  }
+
+  return obterAvaliacoesLocais();
+}
+
+// Analisa SOMENTE as avaliações que aparecem na tela principal de Avaliação Pública
+function calcularPainelApenasPublicas(todasAvaliacoes) {
+  const idsPrivados = obterIdsPrivados();
+
+  const avaliacoesPublicasVisiveis = todasAvaliacoes.filter(
+    (a) => !a.oculta && !a.privada && !idsPrivados.includes(Number(a.id))
+  );
+
   return SERVICOS_FIXOS.map((s) => {
-    const doServico = avaliacoes.filter((a) => Number(a.servico_id) === s.id);
+    const doServico = avaliacoesPublicasVisiveis.filter((a) => Number(a.servico_id) === s.id);
     const quantidade = doServico.length;
     const distribuicao = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
 
@@ -48,7 +85,9 @@ function calcularPainelLocal() {
     doServico.forEach((a) => {
       const n = Number(a.nota);
       soma += n;
-      if (distribuicao[n] !== undefined) distribuicao[n] += 1;
+      if (distribuicao[n] !== undefined) {
+        distribuicao[n] += 1;
+      }
     });
 
     const media = quantidade >= 3 ? Number((soma / quantidade).toFixed(1)) : null;
@@ -63,21 +102,11 @@ function calcularPainelLocal() {
   });
 }
 
-function extrairDistribuicao(item, nota) {
-  if (item.distribuicao && item.distribuicao[nota] !== undefined) {
-    return Number(item.distribuicao[nota]);
-  }
-  if (item[`nota_${nota}`] !== undefined) {
-    return Number(item[`nota_${nota}`]);
-  }
-  return 0;
-}
-
 function renderizarCartoes(lista) {
   painelContainer.innerHTML = lista.map((item) => {
-    const nome = item.nome || item.servico_nome || item.servico;
-    const total = Number(item.quantidade ?? item.total_avaliacoes ?? item.total ?? 0);
-    const amostraInsuficiente = total < 3 || item.amostra_insuficiente === true || item.media === 'amostra insuficiente' || item.media === null;
+    const nome = item.nome;
+    const total = Number(item.quantidade || 0);
+    const amostraInsuficiente = total < 3 || item.media === null;
 
     let exibicaoMedia = '';
     if (amostraInsuficiente) {
@@ -89,7 +118,7 @@ function renderizarCartoes(lista) {
 
     let barrasHtml = '';
     for (let n = 5; n >= 1; n--) {
-      const qtdNota = extrairDistribuicao(item, n);
+      const qtdNota = Number(item.distribuicao[n] || 0);
       const percentual = total > 0 ? Math.round((qtdNota / total) * 100) : 0;
       barrasHtml += `
         <div class="dist-row">
@@ -107,10 +136,10 @@ function renderizarCartoes(lista) {
         <h2>${nome}</h2>
         <div class="metric-box">
           <div>${exibicaoMedia}</div>
-          <div style="font-size: 0.9rem; color: var(--text-muted);">${total} avaliações</div>
+          <div style="font-size: 0.9rem; color: var(--text-muted);">${total} avaliações públicas</div>
         </div>
         <div>
-          <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Distribuição das notas (1 a 5)</strong>
+          <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Distribuição das notas públicas (1 a 5)</strong>
           ${barrasHtml}
         </div>
       </div>
@@ -118,25 +147,17 @@ function renderizarCartoes(lista) {
   }).join('');
 }
 
-async function carregarPainel() {
-  alertPainel.className = 'alert';
+async function carregarPainel(exibirAviso = false) {
+  const avaliacoes = await buscarAvaliacoesAtuais();
+  const dadosPainel = calcularPainelApenasPublicas(avaliacoes);
+  renderizarCartoes(dadosPainel);
 
-  try {
-    const res = await requisitarApi('/painel');
-    if (!res.ok) throw new Error('API indisponível');
-    const dados = await res.json();
-    const lista = Array.isArray(dados) ? dados : (dados.painel || dados.servicos || []);
-
-    if (lista.length > 0) {
-      renderizarCartoes(lista);
-      return;
-    }
-  } catch (err) {
-    // Calcula a partir das avaliações salvas se o backend estiver desligado
+  if (exibirAviso) {
+    const horario = new Date().toLocaleTimeString('pt-BR');
+    alertPainel.textContent = `Painel atualizado às ${horario} (analisando apenas as avaliações públicas da tela principal).`;
+    alertPainel.className = 'alert success';
   }
-
-  renderizarCartoes(calcularPainelLocal());
 }
 
-btnAtualizar.addEventListener('click', carregarPainel);
-carregarPainel();
+btnAtualizar.addEventListener('click', () => carregarPainel(true));
+carregarPainel(false);
