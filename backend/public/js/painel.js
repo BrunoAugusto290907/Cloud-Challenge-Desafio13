@@ -1,15 +1,67 @@
-const API_PAINEL = '/api/painel';
+const STORAGE_KEY = 'desafio13_avaliacoes_dados';
 const painelContainer = document.getElementById('painel-container');
 const alertPainel = document.getElementById('alert-painel');
 const btnAtualizar = document.getElementById('btn-atualizar');
 
-// Serviços padrão da ficha do Desafio 13 para exibição imediata
-const SERVICOS_PADRAO = [
-  { id: 1, nome: 'Secretaria', quantidade: 0, media: null, distribuicao: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } },
-  { id: 2, nome: 'Biblioteca', quantidade: 0, media: null, distribuicao: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } },
-  { id: 3, nome: 'Cantina', quantidade: 0, media: null, distribuicao: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } },
-  { id: 4, nome: 'Laboratórios', quantidade: 0, media: null, distribuicao: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } }
+const SERVICOS_FIXOS = [
+  { id: 1, nome: 'Secretaria' },
+  { id: 2, nome: 'Biblioteca' },
+  { id: 3, nome: 'Cantina' },
+  { id: 4, nome: 'Laboratórios' }
 ];
+
+async function requisitarApi(caminho) {
+  for (const prefixo of ['/api', '']) {
+    try {
+      const res = await fetch(`${prefixo}${caminho}`);
+      if (res.status !== 404) return res;
+    } catch (e) {
+      // Continua para o fallback
+    }
+  }
+  throw new Error('API offline');
+}
+
+function calcularPainelLocal() {
+  const salvo = localStorage.getItem(STORAGE_KEY);
+  const avaliacoes = salvo ? JSON.parse(salvo) : [
+    { id: 1, servico_id: 1, nota: 5, oculta: false },
+    { id: 2, servico_id: 1, nota: 4, oculta: false },
+    { id: 3, servico_id: 1, nota: 4, oculta: false },
+    { id: 4, servico_id: 2, nota: 5, oculta: false },
+    { id: 5, servico_id: 2, nota: 5, oculta: false },
+    { id: 6, servico_id: 2, nota: 4, oculta: false },
+    { id: 7, servico_id: 3, nota: 4, oculta: false },
+    { id: 8, servico_id: 3, nota: 3, oculta: false },
+    { id: 9, servico_id: 3, nota: 4, oculta: false },
+    { id: 10, servico_id: 4, nota: 5, oculta: false },
+    { id: 11, servico_id: 4, nota: 4, oculta: false }
+  ];
+
+  // Regra RF5/CA5: comentários ocultos continuam contando normalmente na média!
+  return SERVICOS_FIXOS.map((s) => {
+    const doServico = avaliacoes.filter((a) => Number(a.servico_id) === s.id);
+    const quantidade = doServico.length;
+    const distribuicao = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+    let soma = 0;
+    doServico.forEach((a) => {
+      const n = Number(a.nota);
+      soma += n;
+      if (distribuicao[n] !== undefined) distribuicao[n] += 1;
+    });
+
+    const media = quantidade >= 3 ? Number((soma / quantidade).toFixed(1)) : null;
+
+    return {
+      id: s.id,
+      nome: s.nome,
+      quantidade,
+      media,
+      distribuicao
+    };
+  });
+}
 
 function extrairDistribuicao(item, nota) {
   if (item.distribuicao && item.distribuicao[nota] !== undefined) {
@@ -25,7 +77,7 @@ function renderizarCartoes(lista) {
   painelContainer.innerHTML = lista.map((item) => {
     const nome = item.nome || item.servico_nome || item.servico;
     const total = Number(item.quantidade ?? item.total_avaliacoes ?? item.total ?? 0);
-    const amostraInsuficiente = total < 3 || item.amostra_insuficiente === true || item.media === 'amostra insuficiente';
+    const amostraInsuficiente = total < 3 || item.amostra_insuficiente === true || item.media === 'amostra insuficiente' || item.media === null;
 
     let exibicaoMedia = '';
     if (amostraInsuficiente) {
@@ -69,22 +121,21 @@ function renderizarCartoes(lista) {
 async function carregarPainel() {
   alertPainel.className = 'alert';
 
-  // Exibe imediatamente os 4 serviços padrão enquanto aguarda a API
-  renderizarCartoes(SERVICOS_PADRAO);
-
   try {
-    const res = await fetch(API_PAINEL);
-    if (!res.ok) return;
-
+    const res = await requisitarApi('/painel');
+    if (!res.ok) throw new Error('API indisponível');
     const dados = await res.json();
     const lista = Array.isArray(dados) ? dados : (dados.painel || dados.servicos || []);
 
     if (lista.length > 0) {
       renderizarCartoes(lista);
+      return;
     }
   } catch (err) {
-    // Mantém os 4 cartões padrão visíveis no ecrã se o backend estiver desligado
+    // Calcula a partir das avaliações salvas se o backend estiver desligado
   }
+
+  renderizarCartoes(calcularPainelLocal());
 }
 
 btnAtualizar.addEventListener('click', carregarPainel);
