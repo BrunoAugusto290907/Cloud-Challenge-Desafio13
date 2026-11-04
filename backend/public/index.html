@@ -11,26 +11,26 @@
     <h1>Avalie o Atendimento</h1>
     <nav>
       <a href="index.html" class="active">Avaliar Serviço</a>
-      <a href="mural.html">Mural Público</a>
       <a href="painel.html">Painel de Satisfação</a>
       <a href="gestor.html">Moderação (Gestor)</a>
     </nav>
   </header>
 
   <main>
+    <!-- FORMULÁRIO DE ENVIO (PÚBLICA OU PRIVADA) -->
     <section class="card">
-      <h2 id="titulo-form">Envia sua Avaliação</h2>
+      <h2 id="titulo-form">Enviar Avaliação Anônima</h2>
       <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
-        Escolha se deseja publicar sua avaliação no mural público ou enviá-la de forma privada apenas para o gestor.
+        Escolha se deseja publicar sua avaliação no mural da primeira tela ou enviá-la de forma privada apenas para o gestor.
       </p>
 
       <div id="alert-box" class="alert"></div>
 
       <form id="form-avaliacao" novalidate>
         <div class="form-group">
-          <label for="visibilidade">Tipo de Avaliação *</label>
+          <label for="visibilidade">Tipo de Avaliação (Visibilidade) *</label>
           <select id="visibilidade" required>
-            <option value="publica">Avaliação Pública (Aparece no Mural Público)</option>
+            <option value="publica">Avaliação Pública (Aparece no mural desta primeira tela)</option>
             <option value="privada">Avaliação Privada (Aparece apenas na tela do Gestor)</option>
           </select>
         </div>
@@ -68,6 +68,24 @@
 
         <button type="submit" id="btn-enviar">Enviar Avaliação Pública</button>
       </form>
+    </section>
+
+    <!-- MURAL APENAS DAS AVALIAÇÕES PÚBLICAS -->
+    <section class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+        <h2 style="margin-bottom: 0;">Avaliações Públicas Registradas</h2>
+        <div style="min-width: 220px;">
+          <select id="filtro-servico" aria-label="Filtrar por serviço">
+            <option value="">Todos os serviços (4)</option>
+            <option value="1">Secretaria</option>
+            <option value="2">Biblioteca</option>
+            <option value="3">Cantina</option>
+            <option value="4">Laboratórios</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="lista-publica">Carregando avaliações públicas...</div>
     </section>
   </main>
 
