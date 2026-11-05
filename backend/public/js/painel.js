@@ -1,163 +1,197 @@
-const STORAGE_KEY = 'desafio13_avaliacoes_dados';
-const PRIVADAS_KEY = 'desafio13_ids_privados';
 
 const painelContainer = document.getElementById('painel-container');
 const alertPainel = document.getElementById('alert-painel');
 const btnAtualizar = document.getElementById('btn-atualizar');
 
-const SERVICOS_FIXOS = [
-  { id: 1, nome: 'Secretaria' },
-  { id: 2, nome: 'Biblioteca' },
-  { id: 3, nome: 'Cantina' },
-  { id: 4, nome: 'Laboratórios' }
-];
+function criarElemento(tag, texto, classe = '') {
+  const elemento = document.createElement(tag);
+  elemento.textContent = String(texto);
 
-const DADOS_INICIAIS = [
-  { id: 1, servico_id: 1, servico_nome: 'Secretaria', nota: 5, comentario: 'Atendimento rápido na emissão do histórico escolar.', oculta: false, privada: false },
-  { id: 2, servico_id: 1, servico_nome: 'Secretaria', nota: 4, comentario: 'Resolveram minha matrícula, apenas uma pequena fila.', oculta: false, privada: false },
-  { id: 3, servico_id: 1, servico_nome: 'Secretaria', nota: 4, comentario: 'Bons esclarecimentos sobre os prazos acadêmicos.', oculta: false, privada: false },
-  { id: 4, servico_id: 2, servico_nome: 'Biblioteca', nota: 5, comentario: 'Ambiente silencioso e acervo muito bem organizado.', oculta: false, privada: false },
-  { id: 5, servico_id: 2, servico_nome: 'Biblioteca', nota: 5, comentario: 'Renovação de livros super prática no balcão.', oculta: false, privada: false },
-  { id: 6, servico_id: 2, servico_nome: 'Biblioteca', nota: 4, comentario: 'Ótimo espaço de estudo em grupo.', oculta: false, privada: false },
-  { id: 7, servico_id: 3, servico_nome: 'Cantina', nota: 4, comentario: 'Lanches bons e atendimento cordial.', oculta: false, privada: false },
-  { id: 8, servico_id: 3, servico_nome: 'Cantina', nota: 3, comentario: 'Fila grande no horário do intervalo das 20h.', oculta: false, privada: false },
-  { id: 9, servico_id: 3, servico_nome: 'Cantina', nota: 4, comentario: 'Boas opções de salgados e sucos.', oculta: false, privada: false },
-  { id: 10, servico_id: 4, servico_nome: 'Laboratórios', nota: 5, comentario: 'Computadores rápidos e com VS Code configurado.', oculta: false, privada: false },
-  { id: 11, servico_id: 4, servico_nome: 'Laboratórios', nota: 4, comentario: 'Rede estável durante toda a aula prática.', oculta: false, privada: false }
-];
-
-function obterIdsPrivados() {
-  try {
-    return JSON.parse(localStorage.getItem(PRIVADAS_KEY) || '[]');
-  } catch (e) {
-    return [];
+  if (classe) {
+    elemento.className = classe;
   }
+
+  return elemento;
 }
 
-function obterAvaliacoesLocais() {
-  try {
-    const salvo = localStorage.getItem(STORAGE_KEY);
-    if (!salvo) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DADOS_INICIAIS));
-      return [...DADOS_INICIAIS];
-    }
-    return JSON.parse(salvo);
-  } catch (e) {
-    return [...DADOS_INICIAIS];
-  }
+function mostrarAlerta(mensagem, tipo) {
+  alertPainel.textContent = mensagem;
+  alertPainel.className = `alert ${tipo}`;
 }
 
-async function buscarAvaliacoesAtuais() {
-  const salvo = localStorage.getItem(STORAGE_KEY);
-  if (salvo) {
-    return JSON.parse(salvo);
-  }
+function criarBarraDistribuicao(nota, quantidade, total) {
+  const percentual = total > 0
+    ? Math.round((quantidade / total) * 100)
+    : 0;
 
-  for (const prefixo of ['/api', '']) {
-    try {
-      const res = await fetch(`${prefixo}/avaliacoes`);
-      if (res.ok) {
-        const dados = await res.json();
-        return Array.isArray(dados) ? dados : (dados.avaliacoes || []);
-      }
-    } catch (e) {
-      // Continua para os dados locais
-    }
-  }
+  const linha = document.createElement('div');
+  linha.className = 'dist-row';
 
-  return obterAvaliacoesLocais();
+  const label = criarElemento('span', `Nota ${nota}`);
+  label.style.width = '48px';
+
+  const fundo = document.createElement('div');
+  fundo.className = 'dist-bar-bg';
+
+  const barra = document.createElement('div');
+  barra.className = 'dist-bar-fill';
+  barra.style.width = `${percentual}%`;
+
+  fundo.appendChild(barra);
+
+  const valor = criarElemento('span', quantidade);
+  valor.style.width = '28px';
+  valor.style.textAlign = 'right';
+
+  linha.append(label, fundo, valor);
+
+  return linha;
 }
 
-// Analisa SOMENTE as avaliações que aparecem na tela principal de Avaliação Pública
-function calcularPainelApenasPublicas(todasAvaliacoes) {
-  const idsPrivados = obterIdsPrivados();
+function criarCartao(servico) {
+  const total = Number(servico.quantidade) || 0;
 
-  const avaliacoesPublicasVisiveis = todasAvaliacoes.filter(
-    (a) => !a.oculta && !a.privada && !idsPrivados.includes(Number(a.id))
+  const cartao = document.createElement('div');
+  cartao.className = 'card';
+  cartao.style.marginBottom = '0';
+
+  const titulo = criarElemento('h2', servico.nome);
+
+  const metricas = document.createElement('div');
+  metricas.className = 'metric-box';
+
+  const mediaContainer = document.createElement('div');
+
+  if (
+    servico.amostra_insuficiente ||
+    total < 3 ||
+    servico.media === null
+  ) {
+    const aviso = criarElemento(
+      'span',
+      'Amostra insuficiente',
+      'badge-insuficiente'
+    );
+
+    mediaContainer.appendChild(aviso);
+  } else {
+    const media = Number(servico.media)
+      .toFixed(1)
+      .replace('.', ',');
+
+    const valorMedia = criarElemento(
+      'span',
+      `${media} ★`,
+      'media-valor'
+    );
+
+    mediaContainer.appendChild(valorMedia);
+  }
+
+  const quantidade = criarElemento(
+    'div',
+    `${total} avaliações`,
   );
 
-  return SERVICOS_FIXOS.map((s) => {
-    const doServico = avaliacoesPublicasVisiveis.filter((a) => Number(a.servico_id) === s.id);
-    const quantidade = doServico.length;
-    const distribuicao = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  quantidade.style.fontSize = '0.9rem';
+  quantidade.style.color = 'var(--text-muted)';
 
-    let soma = 0;
-    doServico.forEach((a) => {
-      const n = Number(a.nota);
-      soma += n;
-      if (distribuicao[n] !== undefined) {
-        distribuicao[n] += 1;
-      }
-    });
+  metricas.append(mediaContainer, quantidade);
 
-    const media = quantidade >= 3 ? Number((soma / quantidade).toFixed(1)) : null;
+  const distribuicaoContainer = document.createElement('div');
 
-    return {
-      id: s.id,
-      nome: s.nome,
-      quantidade,
-      media,
-      distribuicao
-    };
-  });
+  const subtitulo = criarElemento(
+    'strong',
+    'Distribuição das notas (1 a 5)'
+  );
+
+  subtitulo.style.fontSize = '0.85rem';
+  subtitulo.style.display = 'block';
+  subtitulo.style.marginBottom = '0.5rem';
+
+  distribuicaoContainer.appendChild(subtitulo);
+
+  for (let nota = 5; nota >= 1; nota--) {
+    const quantidadeNota = Number(
+      servico.distribuicao?.[nota] || 0
+    );
+
+    distribuicaoContainer.appendChild(
+      criarBarraDistribuicao(nota, quantidadeNota, total)
+    );
+  }
+
+  cartao.append(
+    titulo,
+    metricas,
+    distribuicaoContainer
+  );
+
+  return cartao;
 }
 
-function renderizarCartoes(lista) {
-  painelContainer.innerHTML = lista.map((item) => {
-    const nome = item.nome;
-    const total = Number(item.quantidade || 0);
-    const amostraInsuficiente = total < 3 || item.media === null;
+function renderizarPainel(servicos) {
+  painelContainer.replaceChildren();
 
-    let exibicaoMedia = '';
-    if (amostraInsuficiente) {
-      exibicaoMedia = '<span class="badge-insuficiente">Amostra insuficiente</span>';
-    } else {
-      const valorMedia = Number(item.media).toFixed(1).replace('.', ',');
-      exibicaoMedia = `<span class="media-valor">${valorMedia} ★</span>`;
-    }
+  if (!Array.isArray(servicos) || servicos.length === 0) {
+    painelContainer.textContent =
+      'Nenhum serviço encontrado no banco de dados.';
+    return;
+  }
 
-    let barrasHtml = '';
-    for (let n = 5; n >= 1; n--) {
-      const qtdNota = Number(item.distribuicao[n] || 0);
-      const percentual = total > 0 ? Math.round((qtdNota / total) * 100) : 0;
-      barrasHtml += `
-        <div class="dist-row">
-          <span style="width: 48px;">Nota ${n}</span>
-          <div class="dist-bar-bg">
-            <div class="dist-bar-fill" style="width: ${percentual}%;"></div>
-          </div>
-          <span style="width: 28px; text-align: right;">${qtdNota}</span>
-        </div>
-      `;
-    }
-
-    return `
-      <div class="card" style="margin-bottom: 0;">
-        <h2>${nome}</h2>
-        <div class="metric-box">
-          <div>${exibicaoMedia}</div>
-          <div style="font-size: 0.9rem; color: var(--text-muted);">${total} avaliações públicas</div>
-        </div>
-        <div>
-          <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Distribuição das notas públicas (1 a 5)</strong>
-          ${barrasHtml}
-        </div>
-      </div>
-    `;
-  }).join('');
+  for (const servico of servicos) {
+    painelContainer.appendChild(
+      criarCartao(servico)
+    );
+  }
 }
 
 async function carregarPainel(exibirAviso = false) {
-  const avaliacoes = await buscarAvaliacoesAtuais();
-  const dadosPainel = calcularPainelApenasPublicas(avaliacoes);
-  renderizarCartoes(dadosPainel);
+  btnAtualizar.disabled = true;
+  painelContainer.textContent = 'Carregando painel...';
 
-  if (exibirAviso) {
-    const horario = new Date().toLocaleTimeString('pt-BR');
-    alertPainel.textContent = `Painel atualizado às ${horario} (analisando apenas as avaliações públicas da tela principal).`;
-    alertPainel.className = 'alert success';
+  try {
+    const resposta = await fetch('/api/painel');
+    const dados = await resposta.json().catch(() => null);
+
+    if (!resposta.ok) {
+      throw new Error(
+        dados?.erro || `Erro HTTP ${resposta.status}.`
+      );
+    }
+
+    if (!Array.isArray(dados)) {
+      throw new Error('Resposta inválida do servidor.');
+    }
+
+    renderizarPainel(dados);
+
+    if (exibirAviso) {
+      const horario = new Date().toLocaleTimeString('pt-BR');
+
+      mostrarAlerta(
+        `Painel atualizado às ${horario}.`,
+        'success'
+      );
+    } else {
+      alertPainel.textContent = '';
+      alertPainel.className = 'alert';
+    }
+  } catch (erro) {
+    painelContainer.textContent =
+      'Não foi possível carregar os indicadores.';
+
+    mostrarAlerta(
+      `Erro ao consultar o painel: ${erro.message}`,
+      'error'
+    );
+  } finally {
+    btnAtualizar.disabled = false;
   }
 }
 
-btnAtualizar.addEventListener('click', () => carregarPainel(true));
-carregarPainel(false);
+btnAtualizar.addEventListener('click', () => {
+  carregarPainel(true);
+});
+
+carregarPainel();
