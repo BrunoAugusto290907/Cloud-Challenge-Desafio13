@@ -1,56 +1,63 @@
--- ==========================================================
--- DADOS INICIAIS - AVALIE O ATENDIMENTO
--- PostgreSQL
--- Execute depois de banco/schema.sql.
--- Pode ser executado novamente sem duplicar os dados de demonstração.
--- ==========================================================
+-- Cadastro dos serviços
+INSERT INTO servicos (nome)
+SELECT dados.nome
+FROM (
+    SELECT 'Secretaria' AS nome
+    UNION ALL SELECT 'Biblioteca'
+    UNION ALL SELECT 'Cantina'
+    UNION ALL SELECT 'Laboratórios'
+) AS dados
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM servicos
+    WHERE servicos.nome = dados.nome
+);
 
-BEGIN;
-
--- 1. Serviços exigidos pela ficha.
-INSERT INTO servicos (nome) VALUES
-    ('Secretaria'),
-    ('Biblioteca'),
-    ('Cantina'),
-    ('Laboratórios')
-ON CONFLICT (nome) DO NOTHING;
-
--- 2. Avaliações fictícias. Os serviços são localizados pelo nome;
--- assim, o script não depende de IDs fixos (1, 2, 3 ou 4).
-WITH dados_demo (servico, nota, comentario, oculta) AS (
-    VALUES
-        ('Secretaria', 4, 'Atendimento rápido e eficaz.', false),
-        ('Secretaria', 3, 'Poderia ser um pouco mais rápido nas senhas.', false),
-        ('Secretaria', 5, 'Muito prestativos a resolver o meu problema.', false),
-
-        ('Biblioteca', 5, 'Ambiente muito silencioso e organizado.', false),
-        ('Biblioteca', 5, 'Ótimo acervo bibliográfico.', false),
-        ('Biblioteca', 4, 'Faltam algumas tomadas nas mesas do fundo.', false),
-
-        ('Cantina', 5, 'Comida excelente e barata!', false),
-        ('Cantina', 4, 'As filas são grandes ao meio-dia.', false),
-        ('Cantina', 1, 'Encontrei um inseto na sopa, horrível!', true),
-
-        -- Somente duas avaliações: deve aparecer "amostra insuficiente".
-        ('Laboratórios', 2, 'Computadores lentos e com ratos avariados.', false),
-        ('Laboratórios', 3, 'Falta ar condicionado na sala 3.', false)
-)
+-- Avaliações fictícias
 INSERT INTO avaliacoes (servico_id, nota, comentario, oculta)
 SELECT s.id, d.nota, d.comentario, d.oculta
-  FROM dados_demo AS d
-  JOIN servicos AS s ON s.nome = d.servico
- WHERE NOT EXISTS (
-       SELECT 1
-         FROM avaliacoes AS a
-        WHERE a.servico_id = s.id
-          AND a.nota = d.nota
-          AND a.comentario IS NOT DISTINCT FROM d.comentario
-          AND a.oculta = d.oculta
- );
+FROM (
+    SELECT 'Secretaria' AS servico, 5 AS nota,
+           'Atendimento rápido e funcionários muito educados.' AS comentario,
+           FALSE AS oculta
+    UNION ALL SELECT 'Secretaria', 4, 'Consegui resolver meu problema sem dificuldades.', FALSE
+    UNION ALL SELECT 'Secretaria', 3, 'O atendimento foi bom, mas a espera foi longa.', FALSE
+    UNION ALL SELECT 'Secretaria', 2, 'Demoraram bastante para atender.', FALSE
+    UNION ALL SELECT 'Secretaria', 5, 'Equipe muito atenciosa e prestativa.', FALSE
+    UNION ALL SELECT 'Secretaria', 1, 'Não consegui resolver minha solicitação.', FALSE
+    UNION ALL SELECT 'Secretaria', 4, 'Bom atendimento, poderia melhorar a organização.', FALSE
+    UNION ALL SELECT 'Secretaria', 5, 'Fui muito bem recebido.', FALSE
 
-COMMIT;
+    UNION ALL SELECT 'Biblioteca', 5, 'Ambiente limpo, organizado e silencioso.', FALSE
+    UNION ALL SELECT 'Biblioteca', 4, 'Boa variedade de livros.', FALSE
+    UNION ALL SELECT 'Biblioteca', 5, 'Funcionários muito prestativos.', FALSE
+    UNION ALL SELECT 'Biblioteca', 3, 'Poderia ter mais computadores disponíveis.', FALSE
+    UNION ALL SELECT 'Biblioteca', 2, 'Poucos lugares disponíveis para estudar.', FALSE
+    UNION ALL SELECT 'Biblioteca', 5, 'Ótimo espaço para estudar.', FALSE
+    UNION ALL SELECT 'Biblioteca', 4, 'Bom acervo e ambiente agradável.', FALSE
+    UNION ALL SELECT 'Biblioteca', 5, 'Excelente atendimento.', FALSE
 
--- Quantidade esperada após a primeira execução em um banco vazio:
--- Secretaria: 3 | Biblioteca: 3 | Cantina: 3 | Laboratórios: 2
--- Total: 11 avaliações. Uma avaliação da Cantina tem comentário oculto,
--- mas sua nota continua contando na média e na distribuição.
+    UNION ALL SELECT 'Cantina', 5, 'Comida saborosa e preço acessível.', FALSE
+    UNION ALL SELECT 'Cantina', 4, 'Boa variedade de lanches.', FALSE
+    UNION ALL SELECT 'Cantina', 3, 'A comida é boa, mas a fila é grande.', FALSE
+    UNION ALL SELECT 'Cantina', 2, 'Os preços poderiam ser melhores.', FALSE
+    UNION ALL SELECT 'Cantina', 1, 'O atendimento demorou muito.', FALSE
+    UNION ALL SELECT 'Cantina', 5, 'Atendimento rápido e lanche muito bom.', FALSE
+    UNION ALL SELECT 'Cantina', 4, 'Boa qualidade dos alimentos.', FALSE
+    UNION ALL SELECT 'Cantina', 3, 'Faltam opções de refeições.', FALSE
+    UNION ALL SELECT 'Cantina', 5, 'Funcionários educados.', FALSE
+    UNION ALL SELECT 'Cantina', 2, 'O espaço fica muito cheio no intervalo.', FALSE
+    UNION ALL SELECT 'Cantina', 4, 'Gostei das opções disponíveis.', FALSE
+    UNION ALL SELECT 'Cantina', 1, 'Experiência ruim, não gostei do atendimento.', TRUE
+
+    -- Laboratórios: somente duas avaliações
+    UNION ALL SELECT 'Laboratórios', 4, 'Equipamentos funcionaram corretamente.', FALSE
+    UNION ALL SELECT 'Laboratórios', 3, 'Alguns computadores estão lentos.', FALSE
+) AS d
+JOIN servicos s ON s.nome = d.servico
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM avaliacoes a
+    WHERE a.servico_id = s.id
+      AND a.comentario = d.comentario
+);
