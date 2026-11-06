@@ -20,6 +20,21 @@
 
 ---
 
+## 👥 Integrantes e responsabilidades
+
+A divisão de funções abaixo segue o plano de organização do Grupo 02.
+
+| Integrante | Papel | Responsabilidade principal |
+|---|---|---|
+| Mateus Henrique | DEV — Backend/API | Rotas da API, validações e regras de negócio. |
+| Bruno Augusto | DEV — Frontend | Interface de avaliação, painéis e integração visual com a API. |
+| Bernardo dos Santos | DADOS — Banco e consultas | Modelagem do banco de dados e consultas SQL. |
+| Rafael Henrique | DADOS — Dados iniciais | Scripts de dados iniciais e verificação da persistência. |
+| Gustavo Bezerra | NUVEM — Azure/Deploy | Configuração dos recursos Azure, publicação e monitoramento. |
+| André Luís | QA — Testes e evidências | Casos de teste, evidências, documentação e apoio à apresentação. |
+
+A integração, a revisão e a apresentação do projeto são responsabilidades compartilhadas pela equipe.
+
 ## 📌 Sobre o projeto
 
 O **Avalie+** é uma aplicação web desenvolvida para digitalizar a coleta de opiniões sobre os serviços de uma unidade de ensino. A proposta substitui a tradicional caixa de sugestões por um sistema acessível pela internet, no qual estudantes e demais usuários podem avaliar atendimentos **sem informar nome ou criar conta**.
