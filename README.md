@@ -1,136 +1,130 @@
 <div align="center">
 
-# ⭐ Avalie o Atendimento
+# ⭐ Avalie+
 
-**Avaliações anônimas e painel de satisfação por serviço, com médias em que dá pra confiar.**
+### Sua opinião transforma o atendimento.
 
-![Senac](https://img.shields.io/badge/Senac-Cloud%20Computing%202026.2-004A8F?style=for-the-badge)
-![Grupo](https://img.shields.io/badge/Grupo-02-F7941D?style=for-the-badge)
-![Desafio](https://img.shields.io/badge/Desafio-13-0078D4?style=for-the-badge)
+**Cloud Challenge 2026.2 · Senac · Grupo 02 · Desafio 13 — Avalie o Atendimento**
 
-![Azure](https://img.shields.io/badge/Azure-App%20Service-0078D4?logo=microsoftazure&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-banco%20relacional-4169E1?logo=postgresql&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?logo=nodedotjs&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-22_LTS-339933?logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Azure-4169E1?logo=postgresql&logoColor=white)
+![Microsoft Azure](https://img.shields.io/badge/Microsoft_Azure-App_Service-0078D4?logo=microsoftazure&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Publicado-16a34a)
 
-**Aplicação publicada:** aguardando URL · **Pitch:** pendente · **GitHub Projects:** adicionar link, se utilizado · **Evidências:** adicionar após os testes
+### 🌐 [Acessar o Avalie+](https://bit.ly/avalie-mais)
+
+[Site na Azure](https://avalie-atendimento-g02-awbecghng2fcgqgj.brazilsouth-01.azurewebsites.net/) · [Painel de satisfação](https://avalie-atendimento-g02-awbecghng2fcgqgj.brazilsouth-01.azurewebsites.net/painel.html) · [Repositório](https://github.com/BrunoAugusto290907/Cloud-Challenge-Desafio13)
 
 </div>
 
 ---
 
-## 📇 Ficha rápida
-
-| Campo | Informação |
-|---|---|
-| Disciplina | Cloud Computing · Senac · 2026.2 |
-| Professor | Roni Maciel |
-| Atividade | Cloud Challenge — do problema ao produto na nuvem |
-| Grupo / Desafio | Grupo 02 · Desafio 13 — Avalie o Atendimento |
-| Complexidade | Intermediária |
-| Nível de implantação | A definir após a publicação e validação |
-| URL pública | Pendente — preencher após implantação |
-
 ## 📌 Sobre o projeto
 
-A unidade deseja medir a satisfação com **secretaria, biblioteca, cantina e laboratórios**, substituindo a caixa de sugestões em papel por uma solução digital. O **Avalie o Atendimento** permite que estudantes enviem avaliações **anônimas** e que gestores consultem um **painel por serviço** com quantidade, média e distribuição das notas.
+O **Avalie+** é uma aplicação web desenvolvida para digitalizar a coleta de opiniões sobre os serviços de uma unidade de ensino. A proposta substitui a tradicional caixa de sugestões por um sistema acessível pela internet, no qual estudantes e demais usuários podem avaliar atendimentos **sem informar nome ou criar conta**.
 
-| Perfil | Funcionalidades |
+O projeto contempla quatro serviços:
+
+- **Secretaria**
+- **Biblioteca**
+- **Cantina**
+- **Laboratórios**
+
+As avaliações ajudam a identificar pontos positivos e oportunidades de melhoria, enquanto o painel apresenta indicadores de satisfação por serviço.
+
+## ✨ Funcionalidades
+
+### Para quem avalia
+
+- Seleção de um dos serviços cadastrados.
+- Avaliação de **1 a 5 estrelas**, com seleção visual interativa.
+- Comentário opcional de até **280 caracteres**.
+- Envio **anônimo**, sem cadastro.
+- Escolha entre **avaliação pública** e **avaliação privada**.
+- Mural com comentários públicos e filtro por serviço.
+- Interface responsiva em português brasileiro, com identidade visual e favicon próprios.
+
+### Para acompanhamento e gestão
+
+- **Painel de satisfação** com quantidade de avaliações, média e distribuição das notas de 1 a 5.
+- Exibição de **“Amostra insuficiente”** quando um serviço possui menos de três avaliações, sem apresentar média nesse caso.
+- Área do gestor com acesso às avaliações públicas e privadas por meio de **token de autorização**.
+- Moderação de comentários públicos inadequados, sem apagar a avaliação nem retirar sua nota dos indicadores.
+- Armazenamento persistente no PostgreSQL.
+
+> **Privacidade:** avaliações privadas não são exibidas no mural público. O sistema não solicita identificação do avaliador. A autenticação administrativa é baseada em token e não equivale a um sistema completo de contas de usuários.
+
+## 🛠️ Tecnologias
+
+| Camada | Tecnologia |
 |---|---|
-| Estudante | Escolhe o serviço, atribui nota inteira de 1 a 5 e pode escrever comentário opcional de até 280 caracteres. |
-| Gestor | Consulta avaliações públicas e privadas, acompanha indicadores e oculta comentários públicos impróprios. |
+| Interface | HTML5, CSS3 e JavaScript |
+| Servidor | Node.js e Express 5 |
+| Banco de dados | PostgreSQL e biblioteca `pg` |
+| Configuração | `dotenv` e variáveis de ambiente |
+| Hospedagem | Azure App Service (Linux, Node.js 22 LTS) |
+| Banco na nuvem | Azure Database for PostgreSQL Flexible Server |
+| Versionamento | Git e GitHub |
 
-**Regra central:** serviços com **menos de 3 avaliações** exibem **“Amostra insuficiente”**, sem apresentar média. Ocultar um comentário **não exclui sua nota dos indicadores**.
-
-### Funcionalidade adicional: avaliações públicas e privadas
-
-- **Pública:** pode aparecer no mural público, desde que contenha comentário e não esteja oculta.
-- **Privada:** é armazenada no PostgreSQL e pode ser consultada apenas pela rota protegida do gestor; não aparece no mural.
-- **Ambas:** contam na quantidade, média e distribuição de notas.
-- O sistema não solicita identificação do estudante. O acesso do gestor usa um token simples configurado no servidor; não é um sistema completo de contas e autenticação.
-
-## ✅ Requisitos e situação
-
-**Legenda:** Implementado = presente no código; Pendente de validação = ainda requer teste com PostgreSQL conectado e/ou Azure.
-
-| Requisito | Situação |
-|---|---|
-| RF1 — Quatro serviços cadastrados por script inicial | Implementado; execução no banco a validar |
-| RF2 — Avaliação anônima, nota 1–5 e comentário opcional até 280 caracteres | Implementado; teste integrado pendente |
-| RF3 — Painel com quantidade, média com 1 casa decimal e distribuição 1–5 | Implementado; teste integrado pendente |
-| RF4 — Menos de 3 avaliações: “Amostra insuficiente” | Implementado; teste integrado pendente |
-| RF5 — Gestor oculta comentário sem excluir nota dos indicadores | Implementado; teste integrado pendente |
-| Persistência em PostgreSQL | Implementada no código; conexão e reinício a validar |
-| `GET /health` verifica conexão com banco | Implementado; validar em ambiente publicado |
-| Validação no servidor e consultas SQL parametrizadas | Implementadas; testar casos negativos |
-| Variáveis sensíveis fora do repositório | `.env.example` e `.gitignore` presentes; conferir configuração de produção |
-| Implantação Azure App Service + PostgreSQL | Pendente de publicação e verificação |
-| Evidências, pitch e URL pública | Pendentes |
-
-## 🏗️ Arquitetura
+## ☁️ Arquitetura da solução
 
 ```mermaid
 flowchart LR
-    U["Estudante / Gestor (navegador)"] -->|HTTPS| A["Azure App Service: Node.js + Express + HTML/CSS/JS"]
-    A -->|"DATABASE_URL / TLS"| D[("Azure Database for PostgreSQL")]
-    A -.->|"GET /health"| D
+    U[Usuário no navegador] -->|HTTPS| A[Azure App Service]
+    A --> N[Node.js + Express]
+    N --> F[Frontend HTML / CSS / JS]
+    N -->|Conexão TLS| P[(Azure PostgreSQL)]
+    G[Gestor autorizado] -->|Token nas rotas protegidas| N
 ```
 
-A interface e a API são servidas pela **mesma aplicação Express**. O navegador utiliza rotas relativas (`/api/...`), sem necessidade de configurar uma URL separada para o frontend.
+O frontend e a API são disponibilizados pela mesma aplicação Express. O servidor recebe as avaliações, valida os dados e registra as informações no banco PostgreSQL hospedado na Azure.
 
-### Tecnologias
-
-- **Frontend:** HTML, CSS e JavaScript.
-- **Backend:** Node.js 20 ou superior, Express 5.
-- **Banco:** PostgreSQL com biblioteca `pg`.
-- **Hospedagem prevista:** Azure App Service e Azure Database for PostgreSQL Flexible Server.
-
-## 📁 Estrutura do repositório
+## 📂 Estrutura do projeto
 
 ```text
 Cloud-Challenge-Desafio13/
 ├── README.md
-├── backend/
-│   ├── .env.example
-│   ├── .gitignore
-│   ├── package.json
-│   ├── package-lock.json
-│   ├── requisicoes.http
-│   ├── public/
-│   │   ├── index.html
-│   │   ├── painel.html
-│   │   ├── gestor.html
-│   │   ├── css/style.css
-│   │   └── js/
-│   │       ├── app.js
-│   │       ├── painel.js
-│   │       └── gestor.js
-│   └── src/
-│       ├── server.js
-│       ├── app.js
-│       ├── db.js
-│       ├── validacao.js
-│       └── routes/
-│           ├── health.js
-│           ├── servicos.js
-│           ├── avaliacoes.js
-│           └── painel.js
-└── banco/
-    ├── schema.sql
-    ├── dados-iniciais.sql
-    └── validacao.sql
+├── banco/
+│   ├── schema.sql
+│   ├── dados-iniciais.sql
+│   └── validacao.sql
+└── backend/
+    ├── .env.example
+    ├── package.json
+    ├── package-lock.json
+    ├── public/
+    │   ├── index.html
+    │   ├── painel.html
+    │   ├── gestor.html
+    │   ├── favicon.svg
+    │   ├── css/
+    │   │   └── style.css
+    │   └── js/
+    │       ├── app.js
+    │       ├── painel.js
+    │       └── gestor.js
+    └── src/
+        ├── server.js
+        ├── app.js
+        ├── db.js
+        ├── validacao.js
+        └── routes/
+            ├── health.js
+            ├── servicos.js
+            ├── avaliacoes.js
+            └── painel.js
 ```
 
-A pasta `evidencias/` deve ser criada e preenchida quando os testes e a publicação forem realizados.
-
-## 🚀 Execução local
+## 💻 Como executar localmente
 
 ### Pré-requisitos
 
 - Node.js **20 ou superior** e npm.
-- Um banco PostgreSQL acessível (local ou remoto).
-- Permissão para criar tabelas e inserir os dados iniciais no banco.
+- Acesso a um servidor PostgreSQL.
+- Um banco de dados criado e permissões para executar os scripts SQL.
 
-### 1. Clonar e instalar
+### 1. Clonar o repositório
 
 ```bash
 git clone https://github.com/BrunoAugusto290907/Cloud-Challenge-Desafio13.git
@@ -138,37 +132,37 @@ cd Cloud-Challenge-Desafio13/backend
 npm ci
 ```
 
-### 2. Configurar variáveis
+### 2. Configurar as variáveis de ambiente
 
-Copie `backend/.env.example` para `backend/.env` e ajuste **somente no seu computador**:
+Crie um arquivo `backend/.env` a partir de `backend/.env.example`:
 
 ```env
-DATABASE_URL=postgres://usuario:senha@localhost:5432/avalie
-DATABASE_SSL=false
-GESTOR_TOKEN=substitua-por-um-token-longo-e-aleatorio
 PORT=3000
+DATABASE_URL=postgresql://USUARIO:SENHA@HOST:5432/NOME_DO_BANCO
+DATABASE_SSL=true
+GESTOR_TOKEN=COLOQUE_AQUI_UM_TOKEN_FORTE_E_SECRETO
 ```
 
-`DATABASE_SSL=false` é apropriado apenas para um PostgreSQL local configurado sem TLS. Para PostgreSQL gerenciado na Azure, use `DATABASE_SSL=true` (ou omita a variável, pois o código ativa SSL por padrão).
+Para PostgreSQL local sem TLS, ajuste `DATABASE_SSL=false` conforme a configuração do banco. Para o PostgreSQL da Azure, mantenha a conexão segura habilitada. Senhas com caracteres especiais na URL de conexão devem ser codificadas corretamente.
 
-**Nunca envie `.env`, senhas, tokens ou URLs contendo credenciais para o GitHub, prints ou evidências.**
+**Nunca publique `.env`, senhas, tokens ou URLs de conexão com credenciais no GitHub.**
 
-### 3. Preparar o PostgreSQL
+### 3. Preparar o banco
 
-Crie previamente o banco indicado em `DATABASE_URL`. Na raiz do repositório, execute os scripts **nesta ordem** usando `psql` com conexão e credenciais apropriadas:
+Crie o banco indicado em `DATABASE_URL` e execute os scripts SQL na seguinte ordem, a partir da raiz do repositório:
 
 ```bash
 psql "SUA_STRING_DE_CONEXAO" -f banco/schema.sql
 psql "SUA_STRING_DE_CONEXAO" -f banco/dados-iniciais.sql
 ```
 
-Os comandos acima devem ser executados a partir da **raiz do repositório**. Se você estiver dentro de `backend/`, use `../banco/schema.sql` e `../banco/dados-iniciais.sql`.
+Se estiver na pasta `backend`, use os caminhos `../banco/schema.sql` e `../banco/dados-iniciais.sql`.
 
-Os scripts SQL não são executados automaticamente por `npm start`.
+Os scripts criam a estrutura necessária e cadastram os serviços e dados iniciais. Eles **não** são executados automaticamente pelo `npm start`.
 
-### 4. Iniciar
+### 4. Iniciar o servidor
 
-Dentro de `backend/`:
+Dentro da pasta `backend`:
 
 ```bash
 npm start
@@ -176,182 +170,112 @@ npm start
 
 Acesse:
 
-- Página de avaliações: `http://localhost:3000/`
-- Painel: `http://localhost:3000/painel.html`
-- Gestor: `http://localhost:3000/gestor.html`
-- Saúde da aplicação: `http://localhost:3000/health`
-
-Com banco conectado, `/health` deve responder aproximadamente:
-
-```json
-{
-  "status": "ok",
-  "banco": "conectado",
-  "iniciado_em": "2026-11-05T19:00:00.000Z"
-}
-```
-
-O horário acima é apenas ilustrativo. Se a conexão falhar, a rota responde HTTP **503** com `banco: "indisponivel"`.
-
-## ☁️ Guia de implantação na Azure — para o responsável pelo deploy
-
-> **Atenção:** a publicação ainda precisa ser executada e testada. Não considerar a aplicação pronta apenas porque o App Service inicia.
-
-### 1. Criar/configurar PostgreSQL Flexible Server
-
-1. No portal Azure, criar um **Azure Database for PostgreSQL Flexible Server** em região compatível com os recursos disponíveis.
-2. Definir usuário administrador e senha forte; guardar as credenciais fora do GitHub.
-3. Criar o banco de dados que será utilizado pela aplicação.
-4. Configurar o acesso de rede para que o App Service consiga alcançar o PostgreSQL. A configuração depende da modalidade de rede escolhida (acesso público com regras de firewall apropriadas ou acesso privado com integração de rede).
-5. Exigir conexão segura/TLS conforme a configuração do servidor.
-6. Executar `banco/schema.sql` e depois `banco/dados-iniciais.sql` **nesse banco**.
-7. Confirmar que as quatro opções de serviço foram inseridas.
-
-**Importante:** liberar o IP do computador de quem executa `psql` não garante que o **App Service** terá acesso. Validar especificamente a conectividade da aplicação hospedada. Evitar liberar acesso irrestrito à Internet como solução permanente.
-
-### 2. Criar/configurar Azure App Service
-
-1. Criar um **Web App** com runtime **Node.js 20 ou superior** compatível com o projeto e um plano/região adequados.
-2. Publicar o conteúdo do repositório usando **`backend/` como raiz da aplicação**. O `package.json` precisa ficar na raiz efetivamente implantada, não dentro de uma subpasta adicional.
-3. Se usar integração com GitHub Actions ou outro pipeline, configurar o diretório de trabalho/artefato como `backend` e instalar dependências com `npm ci`.
-4. Garantir que a instalação de dependências seja executada no build/deploy.
-5. O comando de inicialização do projeto é **`npm start`**, que executa `node src/server.js`.
-6. O servidor já lê `process.env.PORT`; não fixar a porta no código. Respeitar a porta fornecida pelo ambiente.
-
-**Observação sobre ZIP:** um ZIP da raiz do repositório pode não funcionar diretamente se `package.json` ficar dentro de `backend/`. Para implantação por ZIP, empacotar **o conteúdo de `backend/`**, deixando `package.json` na raiz do ZIP, e configurar o processo de build conforme o método de publicação escolhido.
-
-### 3. Variáveis de ambiente do App Service
-
-No portal Azure, abrir as configurações de **variáveis de ambiente** do Web App e definir:
-
-| Variável | Valor esperado |
+| Página | Endereço local |
 |---|---|
-| `DATABASE_URL` | String de conexão PostgreSQL apontando para o servidor, banco e usuário corretos. |
-| `DATABASE_SSL` | `true` (ou omitir, pois o código ativa SSL por padrão). |
-| `GESTOR_TOKEN` | Token longo, aleatório e secreto, usado nas rotas de gestor. |
-| `NODE_ENV` | `production` (recomendado). |
-| `PORT` | Normalmente não é necessário definir manualmente; usar a porta do ambiente. |
+| Avaliação | http://localhost:3000/ |
+| Painel | http://localhost:3000/painel.html |
+| Gestor | http://localhost:3000/gestor.html |
+| Saúde da API | http://localhost:3000/health |
 
-Formato ilustrativo da conexão (substituir os valores e codificar caracteres especiais da senha na URL):
+Para desenvolvimento com reinicialização automática, utilize `npm run dev`.
 
-```text
-postgres://USUARIO:SENHA@SERVIDOR.postgres.database.azure.com:5432/NOME_DO_BANCO?sslmode=require
-```
+## 🔌 API REST
 
-**Não copiar credenciais reais para este README.** O aplicativo usa a configuração SSL do `pg` em `backend/src/db.js`. Testar a conexão TLS no ambiente final; não desativar validações de certificado como solução padrão.
-
-Após alterar variáveis de ambiente, salvar as configurações e reiniciar o Web App, se necessário.
-
-### 4. Verificar publicação
-
-Substituir `SEU-APP` pelo nome real do Web App:
-
-```text
-https://SEU-APP.azurewebsites.net/health
-https://SEU-APP.azurewebsites.net/
-https://SEU-APP.azurewebsites.net/painel.html
-https://SEU-APP.azurewebsites.net/gestor.html
-```
-
-Checklist do responsável pelo deploy:
-
-- [ ] `/health` responde HTTP 200, `status: "ok"` e `banco: "conectado"`.
-- [ ] Página principal carrega os quatro serviços a partir da API.
-- [ ] Uma avaliação pública válida é salva e aparece no mural quando possui comentário.
-- [ ] Uma avaliação privada é salva, não aparece no mural e fica acessível ao gestor.
-- [ ] O painel mostra quantidade e distribuição corretas; só mostra média a partir de 3 avaliações.
-- [ ] O gestor consegue ocultar comentário público com token válido.
-- [ ] Um usuário sem token não consegue consultar avaliações privadas nem moderar.
-- [ ] Reiniciar o App Service não remove avaliações salvas.
-- [ ] Nenhuma senha ou token aparece no repositório ou nos registros públicos.
-- [ ] URL pública final foi adicionada ao README e testada em navegador externo.
-
-### 5. Se o banco não conectar
-
-Verificar, nesta ordem:
-
-1. `DATABASE_URL` está correta e contém banco, host e credenciais válidos?
-2. O PostgreSQL está ativo e o banco foi criado?
-3. As regras de rede/firewall permitem acesso **do App Service**?
-4. SSL/TLS está habilitado e funcionando?
-5. `schema.sql` e `dados-iniciais.sql` foram executados no banco correto?
-6. Os logs do App Service mostram erro de conexão, timeout ou autenticação?
-
-A rota `/health` é a primeira verificação. Uma página HTML carregar **não significa** que a conexão com o banco está funcionando.
-
-## 🔌 API
-
-| Método | Endpoint | Função | Acesso |
+| Método | Rota | Descrição | Acesso |
 |---|---|---|---|
-| `GET` | `/health` | Verifica conexão com PostgreSQL | Público |
-| `GET` | `/api/servicos` | Lista serviços | Público |
-| `GET` | `/api/servicos/:id/avaliacoes` | Lista avaliações com comentários públicos e não ocultos | Público |
-| `POST` | `/api/avaliacoes` | Registra avaliação pública ou privada | Público |
+| `GET` | `/health` | Verifica a aplicação e a conexão com o banco | Público |
+| `GET` | `/api/servicos` | Lista os serviços cadastrados | Público |
+| `GET` | `/api/servicos/:id/avaliacoes` | Lista comentários públicos visíveis de um serviço | Público |
+| `POST` | `/api/avaliacoes` | Cadastra avaliação pública ou privada | Público |
 | `GET` | `/api/painel` | Indicadores de todos os serviços | Público |
 | `GET` | `/api/painel/:servicoId` | Indicadores de um serviço | Público |
-| `GET` | `/api/avaliacoes` | Lista avaliações, inclusive privadas e ocultas | Gestor |
-| `PATCH` | `/api/avaliacoes/:id/ocultar` | Oculta comentário público sem remover nota | Gestor |
+| `GET` | `/api/avaliacoes` | Consulta avaliações para moderação | Gestor |
+| `PATCH` | `/api/avaliacoes/:id/ocultar` | Oculta comentário público | Gestor |
 
-Exemplo de avaliação pública:
+As rotas restritas exigem o cabeçalho `x-gestor-token` com o token configurado no servidor. O token **não deve ser compartilhado publicamente**.
+
+Exemplo de avaliação enviada à API:
 
 ```json
 {
   "servico_id": 1,
   "nota": 5,
-  "comentario": "Atendimento rápido e cordial.",
+  "comentario": "Atendimento rápido e atencioso.",
   "privada": false
 }
 ```
 
-Para avaliação privada, utilizar `"privada": true`. O campo `comentario` é opcional. As rotas protegidas exigem o cabeçalho HTTP `x-gestor-token` com o valor de `GESTOR_TOKEN` configurado no servidor. **Nunca incorporar esse token ao JavaScript público.**
+A rota `/health` retorna `status: "ok"` e `banco: "conectado"` quando a conexão está funcionando. Caso o banco esteja indisponível, informa o problema e retorna HTTP 503.
 
-Respostas de erro incluem, conforme o caso, HTTP `400` (entrada inválida), `401` (token ausente/incorreto), `404` (recurso inexistente), `409` (moderação incompatível) e `503` (`/health` quando o banco está indisponível). Falhas inesperadas nas demais rotas atualmente passam pelo tratamento geral HTTP `500`.
+## 🚀 Publicação na Azure
 
-## 🧪 Plano de testes e evidências
+A aplicação foi publicada usando **implantação manual por ZIP** no Azure App Service, com o banco de dados em **Azure Database for PostgreSQL Flexible Server**, na região **Brazil South**.
 
-Os testes abaixo **precisam ser executados e registrados** com PostgreSQL acessível. Não estão marcados como aprovados antecipadamente.
+### Configuração utilizada
 
-| ID | Cenário | Resultado esperado | Status |
-|---|---|---|---|
-| T01 | Criar avaliação pública válida com nota 5 | HTTP 201; avaliação persistida e comentário visível no mural | Pendente |
-| T02 | Criar avaliação privada válida | HTTP 201; visível ao gestor, ausente do mural | Pendente |
-| T03 | Enviar nota 6 ou 0 | HTTP 400; nada inserido | Pendente |
-| T04 | Enviar comentário com mais de 280 caracteres | HTTP 400; nada inserido | Pendente |
-| T05 | Consultar `/api/avaliacoes` sem token | HTTP 401 | Pendente |
-| T06 | Serviço com apenas 2 avaliações | `amostra_insuficiente: true`, `media: null` | Pendente |
-| T07 | Serviço com 3 ou mais avaliações | Média com 1 casa decimal e distribuição correta | Pendente |
-| T08 | Ocultar comentário público com token válido | Comentário some do mural; nota permanece nos indicadores | Pendente |
-| T09 | Reiniciar aplicação após criar avaliação | Registro continua no PostgreSQL | Pendente |
-| T10 | Consultar `/health` com banco conectado | HTTP 200 e `banco: "conectado"` | Pendente |
+- **App Service:** `avalie-atendimento-g02`
+- **Runtime:** Linux / Node.js 22 LTS
+- **Banco:** PostgreSQL Flexible Server
+- **Banco de dados:** `avalie_atendimento`
+- **Variáveis de aplicação:** `DATABASE_URL`, `DATABASE_SSL`, `GESTOR_TOKEN` e `SCM_DO_BUILD_DURING_DEPLOYMENT=true`
+- **Inicialização:** `npm start`
 
-Apoio para testes manuais: `backend/requisicoes.http` e `banco/validacao.sql`. Os dados usados devem ser fictícios.
+O arquivo ZIP é gerado a partir do conteúdo da pasta `backend`, mantendo `package.json` na raiz do pacote e **sem incluir `.env` ou `node_modules`**.
 
-Criar a pasta `evidencias/` na raiz do repositório e guardar capturas datadas, sem credenciais, mostrando:
+Exemplo de criação do ZIP no Windows, com terminal Git Bash aberto na pasta `backend`:
 
-- Requisições positivas e negativas com seus códigos HTTP.
-- Painel antes/depois da terceira avaliação.
-- Moderação de comentário e preservação da nota.
-- Registro persistente após reinício.
-- Aplicação e `/health` na URL pública da Azure.
+```bash
+powershell.exe -NoProfile -Command "Compress-Archive -Path package.json,src,public -DestinationPath backend-deploy.zip -Force"
+```
 
-## 🎬 Apresentação e entrega
+Após a criação, o arquivo é enviado em **Azure App Service → Deployment Center → Manual Deployment (Push)**.
 
-**Pitch (aproximadamente 90 segundos):** apresentar o problema da caixa de sugestões, a solução digital, as quatro áreas avaliadas, o painel com regra de amostra mínima, a moderação, o armazenamento PostgreSQL e a demonstração da aplicação publicada.
+> **Atenção:** a conexão entre o App Service e o PostgreSQL depende das regras de rede do servidor. Para produção, prefira permitir apenas os endereços de saída necessários do aplicativo ou utilizar conectividade privada. Evite manter uma liberação ampla de serviços Azure como configuração permanente.
 
-Antes da entrega final:
+### Endereços publicados
 
-- [ ] Atualizar a URL pública e o nível de implantação na ficha rápida.
-- [ ] Adicionar link do vídeo do pitch.
-- [ ] Adicionar link do GitHub Projects, caso utilizado pela equipe.
-- [ ] Preencher a pasta `evidencias/` com testes datados.
-- [ ] Atualizar os status dos testes com base nos resultados reais.
-- [ ] Confirmar que `backend/.env` e quaisquer segredos não foram enviados ao Git.
-- [ ] Conferir a persistência após reiniciar o App Service.
+- **Link curto:** https://bit.ly/avalie-mais
+- **Aplicação:** https://avalie-atendimento-g02-awbecghng2fcgqgj.brazilsouth-01.azurewebsites.net/
+- **Painel:** https://avalie-atendimento-g02-awbecghng2fcgqgj.brazilsouth-01.azurewebsites.net/painel.html
+- **Saúde:** https://avalie-atendimento-g02-awbecghng2fcgqgj.brazilsouth-01.azurewebsites.net/health
 
-## 👥 Organização do trabalho
+## 🧪 Validação
 
-A integração frontend/backend e a preparação do código para publicação são separadas da execução do deploy na Azure. O responsável pelo deploy deverá configurar os recursos de nuvem, executar os scripts SQL, validar a URL pública e registrar evidências do ambiente publicado.
+Durante a implantação, foram realizados testes manuais de acesso ao site, carregamento dos serviços e comentários, conexão com o PostgreSQL, seleção de estrelas, envio de avaliações públicas e privadas e utilização do painel do gestor.
+
+O endpoint `/health` confirmou a conexão com o banco após o ajuste das regras de rede do PostgreSQL. O sistema permaneceu acessível pela URL pública após a atualização da interface.
+
+**Antes da entrega final**, recomenda-se registrar evidências dos testes, verificar os casos de erro da API, confirmar o funcionamento em dispositivos móveis e revisar as permissões de rede e as credenciais.
+
+## 🔐 Segurança e privacidade
+
+- A aplicação não solicita nome ou cadastro do avaliador.
+- Avaliações privadas não aparecem no mural público.
+- O servidor valida notas, serviços e tamanho dos comentários.
+- As consultas SQL utilizam parâmetros.
+- Rotas administrativas exigem token de autorização.
+- Credenciais devem permanecer em variáveis de ambiente, fora do repositório.
+- Senhas e tokens eventualmente expostos durante o desenvolvimento devem ser substituídos antes da entrega definitiva.
+
+## 🎓 Informações acadêmicas
+
+| Item | Descrição |
+|---|---|
+| Instituição | Senac |
+| Atividade | Cloud Challenge 2026.2 |
+| Disciplina | Cloud Computing |
+| Professor | Roni Maciel |
+| Equipe | Grupo 02 |
+| Desafio | 13 — Avalie o Atendimento |
+| Produto | Avalie+ |
+| Situação | Aplicação implantada e funcionalidades principais testadas |
 
 ---
 
-**Projeto acadêmico — Senac Cloud Computing 2026.2 · Grupo 02 · Desafio 13.**
+<div align="center">
+
+**⭐ Avalie+ — Sua opinião transforma o atendimento.**
+
+Projeto acadêmico desenvolvido para o **Cloud Challenge 2026.2 — Senac**.
+
+</div>
