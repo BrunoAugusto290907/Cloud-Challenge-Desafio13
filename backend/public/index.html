@@ -1,94 +1,175 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Avalie o Atendimento - Enviar Avaliação</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta name="theme-color" content="#101d39">
+  <meta name="description" content="Avalie os serviços da unidade de forma rápida e anônima.">
+  <title>Avalie+ | Sua opinião transforma</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <header>
-    <h1>Avalie o Atendimento</h1>
-    <nav>
-      <a href="index.html" class="active">Avaliar Serviço</a>
-      <a href="painel.html">Painel de Satisfação</a>
-      <a href="gestor.html">Moderação (Gestor)</a>
-    </nav>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/index.html" aria-label="Avalie+ - Início">
+        <span class="brand-icon" aria-hidden="true">★</span>
+        <span>Avalie<span class="brand-plus">+</span></span>
+      </a>
+
+      <nav aria-label="Navegação principal">
+        <a href="/index.html" class="active" aria-current="page">Avaliar</a>
+        <a href="/painel.html">Painel de satisfação</a>
+        <a href="/gestor.html">Área do gestor</a>
+      </nav>
+    </div>
   </header>
 
   <main>
-    <!-- FORMULÁRIO DE ENVIO (PÚBLICA OU PRIVADA) -->
-    <section class="card">
-      <h2 id="titulo-form">Enviar Avaliação Anônima</h2>
-      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
-        Escolha se deseja publicar sua avaliação no mural da primeira tela ou enviá-la de forma privada apenas para o gestor.
-      </p>
+    <section class="hero">
+      <div class="hero-content">
+        <span class="eyebrow">✦ SUA OPINIÃO IMPORTA</span>
+        <h1>Um atendimento melhor começa com <span>você.</span></h1>
+        <p>
+          Compartilhe sua experiência de forma rápida e anônima.
+          Sua avaliação ajuda a melhorar os serviços da nossa unidade.
+        </p>
+        <a href="#avaliar" class="hero-button">Fazer minha avaliação <span aria-hidden="true">→</span></a>
+        <div class="hero-trust">
+          <span>✓ Sem cadastro</span>
+          <span>✓ Anônimo</span>
+          <span>✓ Rápido e simples</span>
+        </div>
+      </div>
 
-      <div id="alert-box" class="alert"></div>
+      <div class="hero-illustration" aria-hidden="true">
+        <div class="hero-glow"></div>
+        <div class="hero-rating-card">
+          <div class="rating-card-top">
+            <span class="rating-card-symbol">★</span>
+            <span class="rating-card-tag">Sua experiência</span>
+          </div>
+          <div class="hero-stars">★★★★★</div>
+          <strong>Sua voz faz a diferença.</strong>
+          <p>Ajude a construir serviços cada vez melhores.</p>
+          <div class="rating-card-bottom">
+            <span class="rating-avatar">✓</span>
+            Avaliação anônima
+          </div>
+        </div>
+        <span class="floating-star star-one">★</span>
+        <span class="floating-star star-two">✦</span>
+      </div>
+    </section>
+
+    <section class="benefits" aria-label="Benefícios">
+      <div class="benefit">
+        <span class="benefit-icon">🔒</span>
+        <div>
+          <strong>100% anônimo</strong>
+          <p>Não pedimos seu nome.</p>
+        </div>
+      </div>
+      <div class="benefit">
+        <span class="benefit-icon">⭐</span>
+        <div>
+          <strong>Simples de avaliar</strong>
+          <p>Escolha de 1 a 5 estrelas.</p>
+        </div>
+      </div>
+      <div class="benefit">
+        <span class="benefit-icon">💬</span>
+        <div>
+          <strong>Você escolhe</strong>
+          <p>Avaliação pública ou privada.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="avaliar" class="card form-card">
+      <div class="section-heading">
+        <span class="section-kicker">COMPARTILHE SUA EXPERIÊNCIA</span>
+        <h2 id="titulo-form">Como foi seu atendimento?</h2>
+        <p>Leva menos de um minuto. Sua opinião faz a diferença!</p>
+      </div>
+
+      <div id="alert-box" class="alert" role="status" aria-live="polite"></div>
 
       <form id="form-avaliacao" novalidate>
         <div class="form-group">
-          <label for="visibilidade">Tipo de Avaliação (Visibilidade) *</label>
+          <label for="visibilidade">Como deseja compartilhar? <span class="required">*</span></label>
           <select id="visibilidade" required>
-            <option value="publica">Avaliação Pública (Aparece no mural desta primeira tela)</option>
-            <option value="privada">Avaliação Privada (Aparece apenas na tela do Gestor)</option>
+            <option value="publica">🌎 Pública — aparece no mural</option>
+            <option value="privada">🔒 Privada — apenas o gestor visualiza</option>
           </select>
+          <p class="field-hint">Você decide quem poderá ver seu comentário.</p>
         </div>
 
         <div class="form-group">
-          <label for="servico_id">Serviço da Unidade *</label>
+          <label for="servico_id">Qual serviço você utilizou? <span class="required">*</span></label>
           <select id="servico_id" required>
-            <option value="">Selecione um serviço...</option>
-            <option value="1">Secretaria</option>
-            <option value="2">Biblioteca</option>
-            <option value="3">Cantina</option>
-            <option value="4">Laboratórios</option>
+            <option value="">Carregando serviços...</option>
           </select>
         </div>
 
-        <div class="form-group">
-          <label for="nota">Nota do Atendimento (1 a 5) *</label>
-          <input
-            type="number"
-            id="nota"
-            step="any"
-            placeholder="Digite uma nota inteira de 1 a 5 (ex: 5)"
-            required
-          >
+        <div class="form-group rating-group">
+          <label id="label-nota">Como você avalia o atendimento? <span class="required">*</span></label>
+          <div class="rating-selector" role="group" aria-labelledby="label-nota">
+            <button type="button" class="estrela" data-nota="1" aria-label="1 estrela" aria-pressed="false">★</button>
+            <button type="button" class="estrela" data-nota="2" aria-label="2 estrelas" aria-pressed="false">★</button>
+            <button type="button" class="estrela" data-nota="3" aria-label="3 estrelas" aria-pressed="false">★</button>
+            <button type="button" class="estrela" data-nota="4" aria-label="4 estrelas" aria-pressed="false">★</button>
+            <button type="button" class="estrela" data-nota="5" aria-label="5 estrelas" aria-pressed="false">★</button>
+          </div>
+          <input type="hidden" id="nota" value="">
+          <p id="texto-nota" class="rating-caption" aria-live="polite">Toque nas estrelas para escolher sua nota</p>
         </div>
 
         <div class="form-group">
-          <label for="comentario" id="label-comentario">Comentário (opcional, máximo de 280 caracteres)</label>
+          <label for="comentario" id="label-comentario">Conte um pouco mais <span class="optional">(opcional)</span></label>
           <textarea
             id="comentario"
-            placeholder="Escreva aqui seu elogio, crítica ou sugestão..."
+            maxlength="280"
+            placeholder="O que você gostou? O que poderia melhorar?"
           ></textarea>
           <div id="char-count" class="char-counter">0 / 280 caracteres</div>
         </div>
 
-        <button type="submit" id="btn-enviar">Enviar Avaliação Pública</button>
+        <button type="submit" id="btn-enviar" class="submit-button">Enviar avaliação pública →</button>
+        <p class="privacy-note">🔒 Sua avaliação é anônima. Não inclua informações pessoais no comentário.</p>
       </form>
     </section>
 
-    <!-- MURAL APENAS DAS AVALIAÇÕES PÚBLICAS -->
-    <section class="card">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
-        <h2 style="margin-bottom: 0;">Avaliações Públicas Registradas</h2>
-        <div style="min-width: 220px;">
-          <select id="filtro-servico" aria-label="Filtrar por serviço">
-            <option value="">Todos os serviços (4)</option>
-            <option value="1">Secretaria</option>
-            <option value="2">Biblioteca</option>
-            <option value="3">Cantina</option>
-            <option value="4">Laboratórios</option>
+    <section class="card community-card">
+      <div class="community-header">
+        <div class="section-heading">
+          <span class="section-kicker">VOZES DA COMUNIDADE</span>
+          <h2>Avaliações da comunidade</h2>
+          <p>Confira o que outras pessoas estão compartilhando.</p>
+        </div>
+
+        <div class="filter-group">
+          <label for="filtro-servico">Filtrar por serviço</label>
+          <select id="filtro-servico">
+            <option value="">Todos os serviços</option>
           </select>
         </div>
       </div>
 
-      <div id="lista-publica">Carregando avaliações públicas...</div>
+      <div id="lista-publica" aria-live="polite">
+        <p class="empty-state">Carregando avaliações públicas...</p>
+      </div>
     </section>
   </main>
 
-  <script src="js/app.js"></script>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-brand">★ Avalie+</span>
+      <span>Sua opinião transforma o atendimento.</span>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
 </body>
 </html>

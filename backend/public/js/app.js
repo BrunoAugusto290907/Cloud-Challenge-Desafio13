@@ -9,8 +9,18 @@ const charCount = document.getElementById('char-count');
 const alertBox = document.getElementById('alert-box');
 const listaPublica = document.getElementById('lista-publica');
 const btnEnviar = document.getElementById('btn-enviar');
+const estrelas = [...document.querySelectorAll('.estrela')];
+const textoNota = document.getElementById('texto-nota');
 
 let servicos = [];
+
+const descricoesNota = {
+  1: 'Muito ruim',
+  2: 'Ruim',
+  3: 'Regular',
+  4: 'Bom',
+  5: 'Excelente!'
+};
 
 function mostrarAlerta(mensagem, tipo) {
   alertBox.textContent = mensagem;
@@ -22,9 +32,7 @@ async function requisicao(url, opcoes = {}) {
   const dados = await resposta.json().catch(() => ({}));
 
   if (!resposta.ok) {
-    throw new Error(
-      dados.erro || `Erro HTTP ${resposta.status}.`
-    );
+    throw new Error(dados.erro || `Erro HTTP ${resposta.status}.`);
   }
 
   return dados;
@@ -41,16 +49,74 @@ function criarElemento(tag, texto, classe = '') {
   return elemento;
 }
 
+function atualizarEstrelas(previsualizacao = null) {
+  const notaSelecionada = Number(inputNota.value) || 0;
+  const notaExibida = previsualizacao ?? notaSelecionada;
+
+  estrelas.forEach(estrela => {
+    const valor = Number(estrela.dataset.nota);
+
+    estrela.classList.toggle(
+      'ativa',
+      valor <= notaSelecionada && previsualizacao === null
+    );
+
+    estrela.classList.toggle(
+      'preview',
+      previsualizacao !== null && valor <= previsualizacao
+    );
+
+    estrela.setAttribute(
+      'aria-pressed',
+      String(valor === notaSelecionada)
+    );
+  });
+
+  if (notaExibida > 0) {
+    textoNota.textContent =
+      `${notaExibida} de 5 estrelas — ${descricoesNota[notaExibida]}`;
+  } else {
+    textoNota.textContent = 'Toque nas estrelas para escolher sua nota';
+  }
+}
+
+estrelas.forEach(estrela => {
+  estrela.addEventListener('click', () => {
+    inputNota.value = estrela.dataset.nota;
+    atualizarEstrelas();
+  });
+
+  estrela.addEventListener('mouseenter', () => {
+    atualizarEstrelas(Number(estrela.dataset.nota));
+  });
+
+  estrela.addEventListener('focus', () => {
+    atualizarEstrelas(Number(estrela.dataset.nota));
+  });
+
+  estrela.addEventListener('blur', () => {
+    atualizarEstrelas();
+  });
+});
+
+const seletorEstrelas = document.querySelector('.rating-selector');
+
+if (seletorEstrelas) {
+  seletorEstrelas.addEventListener('mouseleave', () => {
+    atualizarEstrelas();
+  });
+}
+
 function atualizarVisibilidade() {
   const privada = selectVisibilidade.value === 'privada';
 
   btnEnviar.textContent = privada
-    ? 'Enviar Avaliação Privada (Apenas Gestor)'
-    : 'Enviar Avaliação Pública';
+    ? 'Enviar avaliação privada →'
+    : 'Enviar avaliação pública →';
 
   inputComentario.placeholder = privada
-    ? 'Escreva seu comentário privado (visível somente para o gestor)...'
-    : 'Escreva seu elogio, crítica ou sugestão para o mural público...';
+    ? 'Escreva seu comentário privado, visível somente para o gestor...'
+    : 'O que você gostou? O que poderia melhorar?';
 }
 
 function atualizarContador() {
@@ -106,8 +172,13 @@ function renderizarAvaliacoesPublicas(avaliacoes) {
   listaPublica.replaceChildren();
 
   if (avaliacoes.length === 0) {
-    listaPublica.textContent =
-      'Nenhuma avaliação pública encontrada para este serviço.';
+    listaPublica.appendChild(
+      criarElemento(
+        'p',
+        'Ainda não há avaliações públicas para este serviço.',
+        'empty-state'
+      )
+    );
     return;
   }
 
@@ -116,7 +187,7 @@ function renderizarAvaliacoesPublicas(avaliacoes) {
       s => Number(s.id) === Number(avaliacao.servico_id)
     );
 
-    const item = document.createElement('div');
+    const item = document.createElement('article');
     item.className = 'comment-item';
 
     const conteudo = document.createElement('div');
@@ -129,22 +200,31 @@ function renderizarAvaliacoesPublicas(avaliacoes) {
       servico ? servico.nome : 'Serviço'
     );
 
+    const notaNumerica = Number(avaliacao.nota);
+    const notaValida = Number.isInteger(notaNumerica)
+      && notaNumerica >= 1
+      && notaNumerica <= 5;
+
+    const estrelasNota = notaValida
+      ? '★'.repeat(notaNumerica) + '☆'.repeat(5 - notaNumerica)
+      : '★';
+
     const nota = criarElemento(
       'span',
-      `Nota ${avaliacao.nota} ★`,
+      `${estrelasNota} ${avaliacao.nota}/5`,
       'badge-nota'
     );
 
-    meta.append(nome, ' • ', nota);
+    meta.append(nome, nota);
 
     const comentario = criarElemento(
-      'div',
-      avaliacao.comentario || 'Sem comentário escrito'
+      'p',
+      avaliacao.comentario || 'Avaliação enviada sem comentário.',
+      'comment-text'
     );
 
     conteudo.append(meta, comentario);
     item.appendChild(conteudo);
-
     listaPublica.appendChild(item);
   }
 }
@@ -199,12 +279,8 @@ function validarFormulario(servicoId, nota, comentario) {
     return 'Selecione um serviço válido.';
   }
 
-  if (
-    !Number.isInteger(nota) ||
-    nota < 1 ||
-    nota > 5
-  ) {
-    return 'A nota deve ser um número inteiro de 1 a 5.';
+  if (!Number.isInteger(nota) || nota < 1 || nota > 5) {
+    return 'Selecione uma nota de 1 a 5 estrelas.';
   }
 
   if ([...comentario].length > 280) {
@@ -231,6 +307,7 @@ async function enviarAvaliacao(evento) {
 
   if (erroValidacao) {
     mostrarAlerta(erroValidacao, 'error');
+    alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
 
@@ -242,6 +319,7 @@ async function enviarAvaliacao(evento) {
   };
 
   btnEnviar.disabled = true;
+  btnEnviar.textContent = 'Enviando avaliação...';
 
   try {
     await requisicao('/api/avaliacoes', {
@@ -254,49 +332,46 @@ async function enviarAvaliacao(evento) {
 
     inputNota.value = '';
     inputComentario.value = '';
+
+    atualizarEstrelas();
     atualizarContador();
+
+    if (!privada) {
+      try {
+        await carregarAvaliacoesPublicas();
+      } catch (erroAtualizacao) {
+        console.warn('Erro ao atualizar mural:', erroAtualizacao);
+      }
+    }
 
     mostrarAlerta(
       privada
-        ? 'Avaliação privada salva com sucesso! Apenas o gestor poderá visualizar seu comentário.'
-        : 'Avaliação pública salva com sucesso!',
+        ? 'Avaliação privada enviada com sucesso! Apenas o gestor poderá visualizar seu comentário.'
+        : 'Avaliação pública enviada com sucesso! Obrigado por compartilhar sua experiência.',
       'success'
     );
 
-    // Atualiza o mural sem alterar a mensagem de sucesso.
-    if (!privada) {
-      await carregarAvaliacoesPublicas();
-    }
+    alertBox.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
   } catch (erro) {
     mostrarAlerta(
-      `Não foi possível concluir a operação: ${erro.message}`,
+      `Não foi possível enviar a avaliação: ${erro.message}`,
       'error'
     );
   } finally {
     btnEnviar.disabled = false;
+    atualizarVisibilidade();
   }
 }
 
-selectVisibilidade.addEventListener(
-  'change',
-  atualizarVisibilidade
-);
-
-inputComentario.addEventListener(
-  'input',
-  atualizarContador
-);
-
-filtroServico.addEventListener(
-  'change',
-  carregarAvaliacoesPublicas
-);
-
-formAvaliacao.addEventListener(
-  'submit',
-  enviarAvaliacao
-);
+selectVisibilidade.addEventListener('change', atualizarVisibilidade);
+inputComentario.addEventListener('input', atualizarContador);
+filtroServico.addEventListener('change', carregarAvaliacoesPublicas);
+formAvaliacao.addEventListener('submit', enviarAvaliacao);
 
 atualizarVisibilidade();
 atualizarContador();
+atualizarEstrelas();
 carregarServicos();
